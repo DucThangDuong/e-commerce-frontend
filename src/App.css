@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@layer components {
+  .nav-item {
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors cursor-pointer select-none;
+  }
+
+  .nav-item-active {
+    @apply bg-primary/10 text-primary font-semibold;
+  }
+
+  .nav-item-inactive {
+    @apply text-[#616f89] hover:bg-[#f0f2f4] hover:text-[#111318];
+  }
+}

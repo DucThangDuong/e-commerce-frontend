@@ -7,14 +7,15 @@ export interface ProductDTO {
   categoryId: number;
   basePrice: number;
   stockQuantity: number;
+  imageUrl: string[];
 }
 
 export interface CreateProductDTO {
   name: string;
   description: string;
-  categoryId: number;
-  basePrice: number;
-  stockQuantity: number;
+  base_price: number;
+  stock_quantity: number;
+  category_id: number;
 }
 
 export interface LayoutProps {

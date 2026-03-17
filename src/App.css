@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 @layer components {
   .nav-item {
     @apply flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors cursor-pointer select-none;
@@ -13,4 +14,139 @@
   .nav-item-inactive {
     @apply text-[#616f89] hover:bg-[#f0f2f4] hover:text-[#111318];
   }
+
+  .btn-change {
+    @apply flex items-center gap-2 bg-green-500 hover:bg-green-700 px-6 py-2.5 rounded-lg font-bold text-sm transition-all transform active:scale-95;
+  }
+
+  .btn-edit {
+    @apply flex items-center justify-center gap-2 bg-cyan-500 hover:bg-cyan-700 text-white font-bold py-3 px-4 rounded-xl transition-all hover:shadow-lg;
+  }
+
+  .btn-cancel {
+    @apply flex items-center justify-center gap-2 bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-xl transition-all shadow-md;
+  }
+
+  .input {
+    @apply w-full rounded-lg border border-[#dbdfe6] bg-white text-[#111318] focus:outline-none focus:ring-2 focus:ring-primary/50 focus-within:border-primary focus:border-primary h-12 px-4 py-4 placeholder:text-[#9ca3af] transition-all;
+  }
+
+  .card {
+    @apply bg-white rounded-xl p-6 shadow-sm border border-[#dbdfe6];
+  }
+
+  .label-text {
+    @apply block text-[#111318] text-base font-medium leading-normal pb-2;
+  }
+
+  .tag-chip {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border transition-all duration-200;
+  }
+
+
+
+  /* Radio button custom dot */
+  .radio-dot {
+    @apply w-5 h-5 rounded-full border border-[#dbdfe6] peer-checked:border-primary peer-checked:bg-primary flex items-center justify-center mr-2 transition-all;
+  }
+
+  .radio-dot-inner {
+    @apply w-2 h-2 rounded-full bg-white opacity-0 peer-checked:opacity-100;
+  }
+
+  .radio-label {
+    @apply text-[#111318] group-hover:text-primary transition-colors flex items-center gap-2;
+  }
+
+  /* Section card (settings/profile) */
+  .section-card {
+    @apply bg-white rounded-2xl shadow-sm border border-[#e5e7eb] overflow-hidden;
+  }
+
+  /* Section header inside section-card */
+  .section-header {
+    @apply border-b border-[#f0f4f4] px-6 py-4;
+  }
+
+  /* Inline tag input field */
+  .tag-input-inline {
+    @apply flex-1 bg-transparent border-none focus:ring-0 text-[#111318] placeholder:text-[#9ca3af] min-w-[120px] outline-none;
+  }
+
+  /* Text color tokens */
+  .text-muted {
+    @apply text-[#616f89];
+  }
+
+  .text-muted-alt {
+    @apply text-[#618989];
+  }
+
+  .text-body {
+    @apply text-[#111318];
+  }
+
+  /* ===== Explore Page ===== */
+
+  /* Hero section */
+  .explore-hero {
+    @apply flex flex-col items-center gap-4 mb-10 text-center relative z-10 py-8;
+  }
+
+  .explore-hero__icon {
+    @apply w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center mb-2;
+  }
+
+  /* Search bar */
+  .explore-search {
+    @apply relative flex items-center;
+  }
+
+  .explore-search__icon {
+    @apply absolute left-4 text-[#94a3b8] group-focus-within:text-primary transition-colors;
+  }
+
+  .explore-search__input {
+    @apply w-full h-14 pl-12 pr-12 rounded-xl border-2 border-[#e2e8f0] bg-white text-[#111318] placeholder:text-[#94a3b8] focus:outline-none focus:border-primary focus:ring-0 transition-all shadow-sm text-base;
+  }
+
+  /* University card */
+  .university-card {
+    @apply w-full flex items-center bg-white rounded-xl p-4 border border-[#e5e7eb] shadow-sm cursor-pointer gap-4 text-left transition-all duration-300;
+  }
+
+  .university-card:hover {
+    @apply shadow-lg shadow-primary/10 -translate-y-0.5 border-primary/30;
+  }
+
+  .university-card__logo {
+    @apply w-14 h-14 rounded-xl bg-[#f8fafc] shrink-0 flex items-center justify-center overflow-hidden border border-[#e2e8f0] group-hover:border-primary/30 transition-colors;
+  }
+}
+
+/* Explore page animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-in {
+  animation: fadeInUp 0.35s ease-out;
+}
+
+/* Hide scrollbar while keeping scrollable */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

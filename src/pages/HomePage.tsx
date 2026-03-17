@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import ProductCard from "../component/cart/productcard";
+import ProductCard from "../component/cart/ProductCard";
 import { type ProductDTO } from "../interfaces/product";
 import DashboardLayout from "../layouts/HomeLayout";
 import { apiClient } from "../untils/apiClient";
@@ -9,18 +9,10 @@ const ShopPage: React.FC = () => {
 
   const handleGet = async () => {
     try {
-      const result = await apiClient.get<any>("/product?skip=0&take=10");
-
-      if (Array.isArray(result)) {
-        setProducts(result);
-      } else if (result && Array.isArray(result.data)) {
-        setProducts(result.data);
-      } else if (result && Array.isArray(result.items)) {
-        setProducts(result.items);
-      } else {
-        console.error("Dữ liệu trả về không phải là mảng:", result);
-        setProducts([]);
-      }
+      const result = await apiClient.get<ProductDTO[]>(
+        "/product?skip=0&take=10",
+      );
+      setProducts(result);
     } catch (error) {
       console.error("Failed to fetch products:", error);
       setProducts([]);

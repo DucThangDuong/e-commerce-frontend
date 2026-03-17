@@ -49,45 +49,21 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
               onClick={onClose}
             />
             <NavItem
-              icon="search"
-              label="Tìm kiếm"
-              url="/search"
-              active={isActive(pathname, "/search")}
-              onClick={onClose}
-            />
-            <NavItem
               icon="explore"
               label="Tạo sản phẩm"
               url="/create-product"
               active={isActive(pathname, "/create-product")}
               onClick={onClose}
             />
+            <NavItem
+              icon="shopping_cart"
+              label="Giỏ hàng"
+              url="/cart"
+              active={isActive(pathname, "/cart")}
+              onClick={onClose}
+            />
           </nav>
           <div className="h-px bg-[#f0f2f4] w-full shrink-0"></div>
-          <div>
-            <p className="px-3 text-xs font-semibold text-muted uppercase tracking-wider mb-2">
-              Thư viện
-            </p>
-            <nav className="flex flex-col gap-1">
-              <NavItem
-                icon="folder_open"
-                label="Tệp của tôi"
-                url="/my-documents"
-                active={isActive(pathname, "/my-documents")}
-                onClick={onClose}
-              />
-            </nav>
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-[#f0f2f4]">
-          <NavItem
-            icon="settings"
-            label="Cài đặt"
-            url="/account-settings"
-            active={isActive(pathname, "/account-settings")}
-            onClick={onClose}
-          />
         </div>
       </aside>
     </>

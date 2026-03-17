@@ -1,13 +1,13 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useStore } from "../../zustand/store";
-
+import { logout } from "../../untils/auth"
 interface HeaderProps {
   onMenuClick: () => void;
 }
 
 const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
-  const { isLogin } = useStore((state) => state);
+  const { isLogin, user } = useStore((state) => state);
 
   return (
     <header className="flex items-center whitespace-nowrap border-b border-solid border-[#dbdfe6] px-6 py-3 bg-white z-20 sticky top-0 h-16 shrink-0">
@@ -23,58 +23,35 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
 
           <h2 className="text-xl font-bold cursor-pointer">BrandLogo</h2>
         </div>
-{/* 
-        <div className="input flex max-w-[400px]">
-          <div className="text-muted flex items-center justify-center pl-4 rounded-l-lg border-r-0">
-            <span className="material-symbols-outlined text-[20px]">
-              search
-            </span>
-          </div>
-          <input
-            className="text-l font-bold text-left outline-none bg-transparent w-full p-2"
-            placeholder="Tìm kiếm nội dung, danh mục..."
-          />
-        </div> */}
-
         <div className="flex flex-1 justify-end gap-4">
-          {isLogin ? (
-            <></>
-            // <div className="flex items-center gap-3">
-            //   <button
-            //     className="flex items-center justify-center h-10 w-10 rounded-lg hover:bg-gray-100 text-muted transition-colors"
-            //     title="Thông báo"
-            //   >
-            //     <span className="material-symbols-outlined relative">
-            //       notifications
-            //       <span className="absolute -top-1 font-bold right-0 h-2 w-2 rounded-full bg-red-700"></span>
-            //     </span>
-            //   </button>
-            //   <div className="hidden md:flex flex-col items-end">
-            //     <span className="text-sm font-bold text-body leading-tight">
-            //       {user.fullname || "Người dùng"}
-            //     </span>
-            //     <span className="text-xs text-muted">{user.email}</span>
-            //   </div>
+          {isLogin && user ? (
+            <div className="flex items-center gap-3">
+              <div className="hidden md:flex flex-col items-end">
+                <span className="text-sm font-bold text-body leading-tight">
+                  {user.name || "Người dùng"}
+                </span>
+                <span className="text-xs text-muted">{user.email}</span>
+              </div>
 
-            //   <Link
-            //     to={"/profile"}
-            //     className="w-10 h-10 rounded-lg overflow-hidden border border-[#dbdfe6] hover:ring-2 hover:ring-primary/20 transition-all"
-            //   >
-            //     <img
-            //       src={`${user.avatarUrl}?t=${Date.now}`}
-            //       alt="Avatar"
-            //       className="w-full h-full object-cover"
-            //     />
-            //   </Link>
+              <Link
+                to={"/profile"}
+                className="w-10 h-10 rounded-lg overflow-hidden border border-[#dbdfe6] hover:ring-2 hover:ring-primary/20 transition-all"
+              >
+                <img
+                  src={`${user.avatarUrl}?t=${Date.now}`}
+                  alt="Avatar"
+                  className="w-full h-full object-cover"
+                />
+              </Link>
 
-            //   <button
-            //     onClick={logout}
-            //     className="flex items-center justify-center h-10 w-10 rounded-lg hover:bg-red-50 text-muted hover:text-red-600 transition-colors"
-            //     title="Đăng xuất"
-            //   >
-            //     <span className="material-symbols-outlined">logout</span>
-            //   </button>
-            // </div>
+              <button
+                onClick={logout}
+                className="flex items-center justify-center h-10 w-10 rounded-lg hover:bg-red-50 text-muted hover:text-red-600 transition-colors"
+                title="Đăng xuất"
+              >
+                <span className="material-symbols-outlined">logout</span>
+              </button>
+            </div>
           ) : (
             <>
               <Link

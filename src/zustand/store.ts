@@ -10,6 +10,10 @@ interface StoreState {
   //signalR ID connection
   signalRConnectionId: string | null;
   setSignalRConnectionId: (connectionId: string | null) => void;
+  // thông báo toàn cục
+  notification: { message: string; visible: boolean } | null;
+  showNotification: (message: string) => void;
+  hideNotification: () => void;
 }
 
 export const useStore = create<StoreState>((set) => ({
@@ -20,4 +24,21 @@ export const useStore = create<StoreState>((set) => ({
     set({ signalRConnectionId: connectionId }),
   user: null,
   setUser: (user) => set({ user }),
+  notification: null,
+  showNotification: (message) => {
+    set({ notification: { message, visible: true } });
+    setTimeout(() => {
+      set((state) =>
+        state.notification?.message === message
+          ? { notification: { ...state.notification, visible: false } }
+          : state
+      );
+    }, 2000); // Tự động ẩn sau 2 giây
+  },
+  hideNotification: () =>
+    set((state) =>
+      state.notification
+        ? { notification: { ...state.notification, visible: false } }
+        : state
+    ),
 }));

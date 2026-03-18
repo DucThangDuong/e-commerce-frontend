@@ -1,15 +1,15 @@
 const BASE_URL = import.meta.env.VITE_API_URL;
 import axios from "axios";
 export class ApiError extends Error {
-    status: number;
-    data: object | undefined;
+  status: number;
+  data: object | undefined;
 
-    constructor(status: number, message: string, data?: object) {
-        super(message);
-        this.status = status;
-        this.data = data;
-        Object.setPrototypeOf(this, ApiError.prototype);
-    }
+  constructor(status: number, message: string, data?: object) {
+    super(message);
+    this.status = status;
+    this.data = data;
+    Object.setPrototypeOf(this, ApiError.prototype);
+  }
 }
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
@@ -81,7 +81,8 @@ export const apiClient = {
     axiosInstance.delete<T>(url, data).then((res) => res.data),
   patch: <T>(url: string, data: object) =>
     axiosInstance.patch<T>(url, data).then((res) => res.data),
-
+  deleteQuery: (url: string) =>
+    axiosInstance.delete(url).then((res) => res.data),
   postForm: <T>(url: string, data: FormData) =>
     axiosInstance.post<T>(url, data, {
       headers: {

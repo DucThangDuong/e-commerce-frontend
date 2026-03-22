@@ -30,7 +30,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
             Subtotal ({totalQuantity} items)
           </dt>
           <dd className="text-sm font-medium text-gray-900">
-            ${subtotal.toFixed(2)}
+            {subtotal.toLocaleString("vi-VN")} VNĐ
           </dd>
         </div>
 
@@ -39,14 +39,14 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
             <span>Shipping estimate</span>
           </dt>
           <dd className="text-sm font-medium text-gray-900">
-            ${shipping.toFixed(2)}
+            {shipping.toLocaleString('vi-VN')} VNĐ
           </dd>
         </div>
 
         <div className="border-t border-gray-200 pt-4 flex items-center justify-between">
           <dt className="text-base font-bold text-gray-900">Order Total</dt>
           <dd className="text-base font-bold text-gray-900">
-            ${total.toFixed(2)}
+            {total.toLocaleString("vi-VN")} VNĐ
           </dd>
         </div>
       </dl>
@@ -61,11 +61,10 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
             })
           }
           className={`w-full border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-bold text-white transition-all 
-                        duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                          isCheckoutValid
-                            ? "bg-primary hover:bg-primary/90 focus:ring-primary shadow-lg shadow-primary/25 cursor-pointer"
-                            : "bg-gray-300 cursor-not-allowed"
-                        }`}
+                        duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${isCheckoutValid
+              ? "bg-primary hover:bg-primary/90 focus:ring-primary shadow-lg shadow-primary/25 cursor-pointer"
+              : "bg-gray-300 cursor-not-allowed"
+            }`}
         >
           THANH TOÁN
         </button>

@@ -21,3 +21,11 @@ export interface CreateProductDTO {
 export interface LayoutProps {
   children: ReactNode;
 }
+export interface ProductFeatureDTO {
+  featuredId: number,
+  productId: number,
+  displayOrder: number,
+  startDate: Date,
+  endDate: Date,
+  product: ProductDTO
+}

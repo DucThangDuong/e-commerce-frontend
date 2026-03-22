@@ -113,7 +113,7 @@ const ProductDetailsPage: React.FC = () => {
                 </div>
                 <div className="h-px bg-slate-200 w-full"></div>
                 <div className="space-y-4">
-                  <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wider">
+                  <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
                     Thông tin sản phẩm
                   </h3>
                   <p className="text-slate-600 leading-relaxed text-lg">
@@ -168,7 +168,7 @@ const ProductDetailsPage: React.FC = () => {
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4 pt-4">
-                  <div className="flex items-center gap-3 p-4 rounded-xl bg-slate-100 dark:bg-slate-800/50">
+                  <div className="flex items-center gap-3 p-4 rounded-xl bg-slate-100">
                     <span className="material-symbols-outlined text-slate-500">
                       local_shipping
                     </span>
@@ -177,7 +177,7 @@ const ProductDetailsPage: React.FC = () => {
                       <p className="text-slate-500">On all orders over $150</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 p-4 rounded-xl bg-slate-100 dark:bg-slate-800/50">
+                  <div className="flex items-center gap-3 p-4 rounded-xl bg-slate-100">
                     <span className="material-symbols-outlined text-slate-500">
                       verified_user
                     </span>

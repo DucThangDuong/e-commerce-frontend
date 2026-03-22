@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import RegisterLayout from "../layouts/RegisterLayout";
+import RegisterLayout from "../layouts/HomeLayout";
 import { apiClient, ApiError } from "../untils/apiClient";
-import { InputField } from "../component/Home/InputField";
+import { InputField } from "../component/landing/InputField";
 import type { UserRegister } from "../interfaces/customer";
 
 const RegisterPage: React.FC = () => {
@@ -77,28 +77,30 @@ const RegisterPage: React.FC = () => {
   if (isSuccess) {
     return (
       <RegisterLayout>
-        <div className="w-full max-w-[520px] bg-white rounded-xl shadow-sm border border-[#e5e7eb] p-6 md:p-8 text-center">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <span className="material-symbols-outlined text-3xl text-green-600">
-              check_circle
-            </span>
+        <div className="flex-1 flex items-center justify-center p-4 py-12">
+          <div className="w-full max-w-[520px] bg-white rounded-xl shadow-sm border border-[#e5e7eb] p-6 md:p-8 text-center">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <span className="material-symbols-outlined text-3xl text-green-600">
+                check_circle
+              </span>
+            </div>
+            <h1 className="text-[#111318] text-2xl font-black tracking-tight mb-3">
+              Đăng ký thành công!
+            </h1>
+            <p className="text-[#616f89] text-base mb-8">
+              Tài khoản của bạn đã được khởi tạo. Vui lòng đăng nhập để bắt đầu sử
+              dụng dịch vụ.
+            </p>
+            <button
+              onClick={() => navigate("/login")}
+              className="w-full h-12 bg-primary text-white text-base font-bold rounded-lg hover:bg-blue-700 hover:shadow-lg transition-all shadow-md flex items-center justify-center gap-2"
+            >
+              <span>Đến trang đăng nhập</span>
+              <span className="material-symbols-outlined text-sm">
+                arrow_forward
+              </span>
+            </button>
           </div>
-          <h1 className="text-[#111318] text-2xl font-black tracking-tight mb-3">
-            Đăng ký thành công!
-          </h1>
-          <p className="text-[#616f89] text-base mb-8">
-            Tài khoản của bạn đã được khởi tạo. Vui lòng đăng nhập để bắt đầu sử
-            dụng dịch vụ.
-          </p>
-          <button
-            onClick={() => navigate("/login")}
-            className="w-full h-12 bg-primary text-white text-base font-bold rounded-lg hover:bg-blue-700 hover:shadow-lg transition-all shadow-md flex items-center justify-center gap-2"
-          >
-            <span>Đến trang đăng nhập</span>
-            <span className="material-symbols-outlined text-sm">
-              arrow_forward
-            </span>
-          </button>
         </div>
       </RegisterLayout>
     );
@@ -106,128 +108,130 @@ const RegisterPage: React.FC = () => {
 
   return (
     <RegisterLayout>
-      <div className="w-full max-w-[520px] bg-white rounded-xl shadow-sm border border-[#e5e7eb] p-6 md:p-8">
-        {/* Heading */}
-        <div className="mb-8 text-center md:text-left">
-          <h1 className="text-[#111318] text-3xl font-black tracking-tight mb-2">
-            Tạo tài khoản mới
-          </h1>
-          <p className="text-[#616f89] text-base">
-            Nhập thông tin chi tiết của bạn để bắt đầu
-          </p>
-        </div>
+      <div className="flex-1 flex items-center justify-center p-4 py-12">
 
-        {/* Hiển thị lỗi nếu có */}
-        {error && (
-          <div className="mb-6 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm flex items-center gap-2">
-            <span className="material-symbols-outlined text-lg">error</span>
-            {error}
+        <div className="w-full max-w-[520px] bg-white rounded-xl shadow-sm border border-[#e5e7eb] p-6 md:p-8">
+          {/* Heading */}
+          <div className="mb-8 text-center md:text-left">
+            <h1 className="text-[#111318] text-3xl font-black tracking-tight mb-2">
+              Tạo tài khoản mới
+            </h1>
+            <p className="text-[#616f89] text-base">
+              Nhập thông tin chi tiết của bạn để bắt đầu
+            </p>
           </div>
-        )}
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-          <InputField
-            label="Tên hiển thị"
-            placeholder="Nhập tên hiển thị của bạn"
-            value={displayName}
-            onChange={(e) => setDisplayName(e.target.value)}
-            required
-          />
-
-          <InputField
-            label="Email"
-            placeholder="vidu@email.com"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-
-          <InputField
-            label="Mật khẩu"
-            placeholder="Nhập mật khẩu"
-            isPassword={true}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-
-          <InputField
-            label="Xác nhận mật khẩu"
-            placeholder="Nhập lại mật khẩu"
-            isPassword={true}
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-          />
-
-          {/* Terms Checkbox */}
-          <div className="flex items-start gap-3 mt-2">
-            <div className="flex items-center h-5">
-              <input
-                id="terms"
-                type="checkbox"
-                required
-                className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer"
-              />
+          {/* Hiển thị lỗi nếu có */}
+          {error && (
+            <div className="mb-6 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm flex items-center gap-2">
+              <span className="material-symbols-outlined text-lg">error</span>
+              {error}
             </div>
-            <label
-              htmlFor="terms"
-              className="text-sm text-[#616f89] cursor-pointer select-none"
-            >
-              Tôi đồng ý với{" "}
-              <a href="#" className="text-primary hover:underline font-medium">
-                Điều khoản dịch vụ
-              </a>{" "}
-              và{" "}
-              <a href="#" className="text-primary hover:underline font-medium">
-                Chính sách bảo mật
-              </a>
-            </label>
-          </div>
+          )}
 
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={isLoading}
-            className={`mt-4 w-full h-12 text-white text-base font-bold rounded-lg transition-all shadow-md flex items-center justify-center gap-2
-              ${
-                isLoading
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+            <InputField
+              label="Tên hiển thị"
+              placeholder="Nhập tên hiển thị của bạn"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              required
+            />
+
+            <InputField
+              label="Email"
+              placeholder="vidu@email.com"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+
+            <InputField
+              label="Mật khẩu"
+              placeholder="Nhập mật khẩu"
+              isPassword={true}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+
+            <InputField
+              label="Xác nhận mật khẩu"
+              placeholder="Nhập lại mật khẩu"
+              isPassword={true}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+            />
+
+            {/* Terms Checkbox */}
+            <div className="flex items-start gap-3 mt-2">
+              <div className="flex items-center h-5">
+                <input
+                  id="terms"
+                  type="checkbox"
+                  required
+                  className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer"
+                />
+              </div>
+              <label
+                htmlFor="terms"
+                className="text-sm text-[#616f89] cursor-pointer select-none"
+              >
+                Tôi đồng ý với{" "}
+                <a href="#" className="text-primary hover:underline font-medium">
+                  Điều khoản dịch vụ
+                </a>{" "}
+                và{" "}
+                <a href="#" className="text-primary hover:underline font-medium">
+                  Chính sách bảo mật
+                </a>
+              </label>
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={isLoading}
+              className={`mt-4 w-full h-12 text-white text-base font-bold rounded-lg transition-all shadow-md flex items-center justify-center gap-2
+              ${isLoading
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-primary hover:bg-blue-700 hover:shadow-lg"
-              }`}
-          >
-            {isLoading ? (
-              <>
-                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                <span>Đang xử lý...</span>
-              </>
-            ) : (
-              <>
-                <span>Đăng ký</span>
-                <span className="material-symbols-outlined text-sm">
-                  arrow_forward
-                </span>
-              </>
-            )}
-          </button>
-        </form>
-
-        {/* Footer Link */}
-        <div className="mt-8 text-center">
-          <p className="text-sm text-[#616f89]">
-            Bạn đã có tài khoản?{" "}
-            <Link
-              to="/login"
-              className="text-primary font-bold hover:underline ml-1"
+                }`}
             >
-              Đăng nhập ngay
-            </Link>
-          </p>
+              {isLoading ? (
+                <>
+                  <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                  <span>Đang xử lý...</span>
+                </>
+              ) : (
+                <>
+                  <span>Đăng ký</span>
+                  <span className="material-symbols-outlined text-sm">
+                    arrow_forward
+                  </span>
+                </>
+              )}
+            </button>
+          </form>
+
+          {/* Footer Link */}
+          <div className="mt-8 text-center">
+            <p className="text-sm text-[#616f89]">
+              Bạn đã có tài khoản?{" "}
+              <Link
+                to="/login"
+                className="text-primary font-bold hover:underline ml-1"
+              >
+                Đăng nhập ngay
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
-    </RegisterLayout>
+    </RegisterLayout >
   );
 };
 

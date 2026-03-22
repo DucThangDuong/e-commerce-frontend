@@ -11,7 +11,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     return (
         <div
             onClick={() => navigate(`/product/${product.productId}`)}
-            className="group bg-white rounded-2xl border border-slate-100 overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col cursor-pointer"
+            className="group bg-white rounded-2xl hover:shadow-xl transition-all duration-300 flex flex-col cursor-pointer"
         >
             <div className="relative aspect-square overflow-hidden bg-slate-100">
                 <img
@@ -27,7 +27,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
                 <div className="mt-auto">
                     <div className="flex items-center justify-between mb-4">
-                        <span className="text-xl font-black text-primary">${product.basePrice.toFixed(2)}</span>
+                        <span className="text-xl font-black text-primary">{product.basePrice.toLocaleString('vi-VN')} VNĐ</span>
                     </div>
                 </div>
             </div>

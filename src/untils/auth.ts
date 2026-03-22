@@ -10,7 +10,7 @@ export const isLoggedIn = (): boolean => {
 
 export const logout = async () => {
   try {
-    await apiClient.post("/auth/logout");
+    await apiClient.post("/logout");
   } catch (error) {
     console.error("Lỗi khi gọi API logout:", error);
   } finally {

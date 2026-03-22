@@ -81,7 +81,7 @@ const CartItem: React.FC<CartItemProps> = ({
 
         {/* Tổng tiền của item */}
         <div className="flex-1 text-sm font-bold text-gray-900 text-right min-w-[70px]">
-          {(item.basePrice * item.quantity).toFixed(3)} VND
+          {(item.basePrice * item.quantity).toLocaleString("vi-VN")} VND
         </div>
 
         {/* Nút Xóa */}

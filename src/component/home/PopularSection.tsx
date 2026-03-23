@@ -36,7 +36,7 @@ const HeroSection: React.FC = () => {
 
   const featured = featuredData.length > 0 ? featuredData[currentIndex] : null;
 
-  const currentTitle = featured?.product?.name || 'BORN ON THE TRACK.';
+  const currentTitle = featured?.product?.name || "";
   const words = currentTitle.split(' ');
   const firstWord = words[0];
   const restOfTitle = words.slice(1).join(' ');

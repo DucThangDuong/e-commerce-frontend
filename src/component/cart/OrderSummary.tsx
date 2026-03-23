@@ -22,12 +22,12 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
 
   return (
     <section className="mt-0 bg-white rounded-lg px-4 py-6  col-span-4 border border-gray-200 shadow-sm">
-      <h2 className="text-lg font-bold text-gray-900">Order Summary</h2>
+      <h2 className="text-lg font-bold text-gray-900">Tổng thanh toán</h2>
 
       <dl className="mt-6 space-y-4">
         <div className="flex items-center justify-between">
           <dt className="text-sm text-gray-600">
-            Subtotal ({totalQuantity} items)
+            Số lượng ({totalQuantity})
           </dt>
           <dd className="text-sm font-medium text-gray-900">
             {subtotal.toLocaleString("vi-VN")} VNĐ
@@ -36,7 +36,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
 
         <div className="border-t border-gray-200 pt-4 flex items-center justify-between">
           <dt className="flex items-center text-sm text-gray-600">
-            <span>Shipping estimate</span>
+            <span>Tiền ship</span>
           </dt>
           <dd className="text-sm font-medium text-gray-900">
             {shipping.toLocaleString('vi-VN')} VNĐ
@@ -44,7 +44,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
         </div>
 
         <div className="border-t border-gray-200 pt-4 flex items-center justify-between">
-          <dt className="text-base font-bold text-gray-900">Order Total</dt>
+          <dt className="text-base font-bold text-gray-900">Tổng cộng</dt>
           <dd className="text-base font-bold text-gray-900">
             {total.toLocaleString("vi-VN")} VNĐ
           </dd>

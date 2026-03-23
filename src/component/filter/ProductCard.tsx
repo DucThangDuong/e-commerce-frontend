@@ -27,7 +27,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
                 <div className="mt-auto">
                     <div className="flex items-center justify-between mb-4">
-                        <span className="text-xl font-black text-primary">{product.basePrice.toLocaleString('vi-VN')} VNĐ</span>
+                        <span className="text-l font-black text-primary">{product.basePrice.toLocaleString('vi-VN')} VNĐ</span>
                     </div>
                 </div>
             </div>

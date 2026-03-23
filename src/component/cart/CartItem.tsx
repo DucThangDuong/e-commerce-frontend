@@ -40,7 +40,7 @@ const CartItem: React.FC<CartItemProps> = ({
       <div className="ml-4 flex flex-1 items-center gap-4 min-w-0">
         <div className="flex-[2] min-w-0">
           <a
-            href="#"
+            href={`/product/${item.productId}`}
             className="text-sm font-medium text-gray-800 hover:text-blue-600 transition-colors duration-200 truncate block"
           >
             {item.name}
@@ -48,7 +48,7 @@ const CartItem: React.FC<CartItemProps> = ({
         </div>
         <div className="flex-1 text-end">
           <p className="mt-0.5 text-xs text-gray-500">
-            {item.basePrice.toFixed(3)} VND
+            {item.basePrice.toLocaleString("vi-VN")} VND
           </p>
         </div>
 

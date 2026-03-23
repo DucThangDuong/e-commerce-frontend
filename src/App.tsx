@@ -1,6 +1,6 @@
 import "./App.css";
-import ProductPage from "./pages/HomePage";
-import LandingPage from "./pages/LandingPage";
+import ProductPage from "./pages/FilterPage";
+import LandingPage from "./pages/HomePage";
 import CreateProductPage from "./pages/CreateProductPage";
 import ProductDetailsPage from "./pages/ProductDetailsPage";
 import CheckoutPage from "./pages/CheckoutPage";
@@ -37,15 +37,23 @@ const GuestRoute = () => {
 
 const GlobalNotification = () => {
   const notification = useStore((state) => state.notification);
-
   if (!notification) return null;
 
   return (
     <div
-      className={`fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[9999] transition-all duration-300 ease-out flex flex-col items-center justify-center gap-2 p-6 rounded-2xl bg-black/80 text-white shadow-2xl backdrop-blur-md pointer-events-none text-center min-w-[200px] ${notification.visible ? "opacity-100 scale-100" : "opacity-0 scale-90"
-        }`}
+      className={`fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[9999] transition-all duration-300 ease-out
+         flex flex-col items-center justify-center gap-2 p-6 rounded-2xl bg-black/80 text-white shadow-2xl backdrop-blur-md
+          pointer-events-none text-center min-w-[200px] ${
+            notification.visible
+              ? "opacity-100 scale-100"
+              : "opacity-0 scale-90"
+          }`}
     >
-      <span className="material-symbols-outlined text-4xl text-green-400">check_circle</span>
+      <span
+        className={`material-symbols-outlined text-4xl ${notification.type === "error" ? "text-red-400" : "text-green-400"}`}
+      >
+        {notification.type === "error" ? "error" : "check_circle"}
+      </span>
       <p className="font-bold text-lg">{notification.message}</p>
     </div>
   );
@@ -65,7 +73,6 @@ function App() {
         } else {
           const data: { accessToken: string } =
             await apiClient.post("/refresh-token");
-
           localStorage.setItem("accessToken", data.accessToken);
           const userData: UserProfilePrivate =
             await apiClient.get("/customer/profile");

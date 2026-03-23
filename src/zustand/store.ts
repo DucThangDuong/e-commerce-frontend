@@ -11,8 +11,8 @@ interface StoreState {
   signalRConnectionId: string | null;
   setSignalRConnectionId: (connectionId: string | null) => void;
   // thông báo toàn cục
-  notification: { message: string; visible: boolean } | null;
-  showNotification: (message: string) => void;
+  notification: { message: string; visible: boolean; type: "success" | "error" } | null;
+  showNotification: (message: string, type?: "success" | "error") => void;
   hideNotification: () => void;
 }
 
@@ -25,8 +25,8 @@ export const useStore = create<StoreState>((set) => ({
   user: null,
   setUser: (user) => set({ user }),
   notification: null,
-  showNotification: (message) => {
-    set({ notification: { message, visible: true } });
+  showNotification: (message, type = "success") => {
+    set({ notification: { message, visible: true, type } });
     setTimeout(() => {
       set((state) =>
         state.notification?.message === message

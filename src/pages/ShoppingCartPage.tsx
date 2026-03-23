@@ -89,12 +89,12 @@ const ShoppingCartPage: React.FC = () => {
       <div className="bg-gray-50 font-sans text-slate-900 min-h-screen flex flex-col">
         <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
           <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 mb-8">
-            Your Shopping Cart
+            Giỏ hàng của bạn
           </h1>
 
           <div className="lg:grid lg:grid-cols-12 lg:gap-x-12 lg:items-start">
             {/* Cart Items List */}
-            <section className="lg:col-span-8">
+            <section className="col-span-8">
               <ul className="border-t border-b border-gray-200 divide-y divide-gray-200">
                 {CartItemm.map((item) => (
                   <CartItem

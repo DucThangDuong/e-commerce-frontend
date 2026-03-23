@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import RegisterLayout from "../layouts/HomeLayout";
 import { apiClient, ApiError } from "../untils/apiClient";
-import { InputField } from "../component/landing/InputField";
+import { InputField } from "../component/home/InputField";
 import type { UserRegister } from "../interfaces/customer";
 
 const RegisterPage: React.FC = () => {

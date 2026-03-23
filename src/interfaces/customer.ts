@@ -17,5 +17,5 @@ export interface UserProfilePublic {
 export interface UserProfilePrivate extends UserProfilePublic {
   email: string;
   address: string;
-  phoneNumber: number;
+  phoneNumber: string;
 }

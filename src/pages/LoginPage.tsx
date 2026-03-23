@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 import LoginLayout from "../layouts/HomeLayout";
 import { apiClient } from "../untils/apiClient";
-import { InputField } from "../component/landing/InputField";
+import { InputField } from "../component/home/InputField";
 import { useStore } from "../zustand/store";
 import type { UserLogin, UserProfilePrivate } from "../interfaces/customer";
 

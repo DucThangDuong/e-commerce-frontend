@@ -1,5 +1,5 @@
 import React from "react";
-import Header from "../component/landing/Header";
+import Header from "../component/home/Header";
 import type { LayoutProps } from "../interfaces/product";
 const DashboardLayout: React.FC<LayoutProps> = ({ children }) => {
   return (

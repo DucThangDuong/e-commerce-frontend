@@ -6,22 +6,30 @@ import DashboardLayout from "../layouts/HomeLayout";
 import { useStore } from "../zustand/store";
 import RelatedProducts from "../component/productdetail/related";
 import { isLoggedIn } from "../untils/auth";
-
+import { useSignalR } from "../untils/signalR";
+interface ProductUpdate {
+  productId: number;
+  quantity: number;
+}
 const ProductDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { connection } = useSignalR();
   const [product, setProduct] = useState<ProductDTO | null>(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const showNotification = useStore((state) => state.showNotification);
+  const { signalRConnectionId } = useStore();
   const [itemQuantity, setItemQuantity] = useState<number>(1);
-
+  const [cartItems, setCartItems] = useState<Record<number, number>>({});
   useEffect(() => {
     const fetchProduct = async () => {
+      console.log(signalRConnectionId);
       try {
         const result = await apiClient.get<ProductDTO>(
-          `/product/detail?productId=${id}`,
+          `/product/detail?productId=${id}&&connectionId=${signalRConnectionId}`,
         );
         setProduct(result);
+        setCartItems({ [result.productId]: result.stockQuantity });
       } catch (error) {
         console.error("Failed to fetch product details:", error);
       }
@@ -30,6 +38,18 @@ const ProductDetailsPage: React.FC = () => {
       fetchProduct();
     }
   }, [id]);
+
+  useEffect(() => {
+    if (!connection || !id) return;
+    connection.on("ReceiveProductUpdate", (data) => {
+      const update: ProductUpdate = JSON.parse(data);
+      setCartItems({ [update.productId]: update.quantity });
+    });
+    return () => {
+      connection.off("ReceiveProductUpdate");
+    };
+  }, [connection, id]);
+
   const handleAddToCart = async (productId: number) => {
     const islogin = isLoggedIn();
     if (!islogin) {
@@ -115,7 +135,7 @@ const ProductDetailsPage: React.FC = () => {
                     </span>
                   </div>
                   <span className="bg-primary/10 text-primary px-2 py-1 rounded-lg text-xs font-bold">
-                    Số lượng: {product.stockQuantity}
+                    Số lượng: {cartItems[product.productId]}
                   </span>
                 </div>
                 <div className="h-px bg-slate-200 w-full"></div>
@@ -197,7 +217,7 @@ const ProductDetailsPage: React.FC = () => {
           </main>
         </div>
       </div>
-    </DashboardLayout>
+    </DashboardLayout >
   );
 };
 

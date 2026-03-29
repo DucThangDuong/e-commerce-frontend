@@ -20,7 +20,7 @@ const Navigation: React.FC = () => {
           <NavItem label="Shop" url="/" active={isActive(location.pathname, "/")} onClick={() => { }} />
           <NavItem label="Categories" url="/categories" active={isActive(location.pathname, "/categories")} onClick={() => { }} />
           <NavItem label="Service" url="/service" active={isActive(location.pathname, "/service")} onClick={() => { }} />
-          <NavItem label="Contact" url="/contact" active={isActive(location.pathname, "/contact")} onClick={() => { }} />
+          <NavItem label="Purchase" url="/purchase" active={isActive(location.pathname, "/purchase")} onClick={() => { }} />
         </div>
         <div className="flex items-center space-x-6">
           <Link to="/cart" className="scale-95 active:scale-90 transition-transform text-zinc-900 relative">

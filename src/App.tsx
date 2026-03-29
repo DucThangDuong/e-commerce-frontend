@@ -20,6 +20,7 @@ import { useEffect } from "react";
 import { apiClient } from "./untils/apiClient";
 import type { UserProfilePrivate } from "./interfaces/customer";
 import ShoppingCartPage from "./pages/ShoppingCartPage";
+import OrderHistoryPage from "./pages/OrderHistoryPage";
 const ProtectedRoute = () => {
   const isAuth = isLoggedIn();
   if (!isAuth) {
@@ -43,11 +44,10 @@ const GlobalNotification = () => {
     <div
       className={`fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[9999] transition-all duration-300 ease-out
          flex flex-col items-center justify-center gap-2 p-6 rounded-2xl bg-black/80 text-white shadow-2xl backdrop-blur-md
-          pointer-events-none text-center min-w-[200px] ${
-            notification.visible
-              ? "opacity-100 scale-100"
-              : "opacity-0 scale-90"
-          }`}
+          pointer-events-none text-center min-w-[200px] ${notification.visible
+          ? "opacity-100 scale-100"
+          : "opacity-0 scale-90"
+        }`}
     >
       <span
         className={`material-symbols-outlined text-4xl ${notification.type === "error" ? "text-red-400" : "text-green-400"}`}
@@ -103,6 +103,7 @@ function App() {
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/create-product" element={<CreateProductPage />} />
           <Route path="/profile" element={<UserProfilePage />} />
+          <Route path="/purchase" element={<OrderHistoryPage />} />
         </Route>
       </Routes>
       <GlobalNotification />

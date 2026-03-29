@@ -2,7 +2,7 @@ import React from 'react';
 
 const Footer: React.FC = () => {
   return (
-    <footer className="bg-zinc-100 w-full pt-20 pb-10">
+    <footer className="bg-zinc-100 w-full pt-20 pb-10 z-10">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-12 max-w-7xl mx-auto px-8">
         <div className="col-span-2 md:col-span-1 space-y-6">
           <div className="font-['Space_Grotesk'] font-extrabold text-zinc-900 text-2xl italic tracking-tighter uppercase">

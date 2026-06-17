@@ -1,13 +1,38 @@
 const BASE_URL = import.meta.env.VITE_API_URL;
 import axios from "axios";
+
+export function getCookie(name: string) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()?.split(';').shift();
+  return null;
+}
+
+export function setCookie(name: string, value: string) {
+  document.cookie = `${name}=${value};path=/;max-age=86400`;
+}
+
+export function removeCookie(name: string) {
+  document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+}
+
 export class ApiError extends Error {
   status: number;
   data: object | undefined;
+  message: string ;
+  errorCode: string;
+  errors: object | null;
+  traceId: string | null;
 
-  constructor(status: number, message: string, data?: object) {
+  constructor(status: number, message: string, data?: object,
+    errorCode?: string, errors: object | null = null, traceId: string | null = null) {
     super(message);
     this.status = status;
     this.data = data;
+    this.message = message;
+    this.errorCode = errorCode || '';
+    this.errors = errors;
+    this.traceId = traceId;
     Object.setPrototypeOf(this, ApiError.prototype);
   }
 }
@@ -20,7 +45,7 @@ const axiosInstance = axios.create({
 });
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("accessToken");
+    const token = getCookie("accessToken");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -43,12 +68,12 @@ axiosInstance.interceptors.response.use(
         const response = await axiosInstance.post(`${BASE_URL}/refresh-token`);
 
         const { accessToken: newAccessToken } = response.data;
-        localStorage.setItem("accessToken", newAccessToken);
+        setCookie("accessToken", newAccessToken);
 
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         return axiosInstance(originalRequest);
       } catch (refreshError) {
-        localStorage.removeItem("accessToken");
+        removeCookie("accessToken");
         return Promise.reject(refreshError);
       }
     }

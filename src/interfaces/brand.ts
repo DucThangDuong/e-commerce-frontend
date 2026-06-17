@@ -1,6 +1,6 @@
-export interface BrandDTO {
+export interface ResBrandDto {
   brandId: number;
   name: string;
-  logoUrl: string;
-  description: string;
+  description?: string | null;
+  logoUrl?: string | null;
 }

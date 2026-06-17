@@ -1,19 +1,15 @@
-export interface CartItemType {
-  cart_id: number;
-  quantity: number;
+export interface ResCartDto {
+  cartId: number;
   productId: number;
-  name: string;
-  description: string;
+  colorId: number;
+  colorName: string;
+  quantity: number;
   categoryId: number;
+  name: string;
+  description?: string | null;
   basePrice: number;
   stockQuantity: number;
-  imageUrl: string[];
-}
-
-export interface RelatedProductType {
-  id: number;
-  name: string;
-  price: number;
-  color: string;
-  imageUrl: string;
-}
+  imageUrl?: string[] | null;
+  priceAdjustment?: number;
+  discountedPrice?: number;
+  activePromotion?: any;

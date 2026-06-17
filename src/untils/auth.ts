@@ -1,6 +1,6 @@
-import { apiClient } from "./apiClient";
+import { apiClient, getCookie, removeCookie } from "./apiClient";
 export const getToken = (): string | null => {
-  return localStorage.getItem("accessToken");
+  return getCookie("accessToken");
 };
 
 export const isLoggedIn = (): boolean => {
@@ -14,7 +14,7 @@ export const logout = async () => {
   } catch (error) {
     console.error("Lỗi khi gọi API logout:", error);
   } finally {
-    localStorage.removeItem("accessToken");
+    removeCookie("accessToken");
     localStorage.removeItem("user");
     window.location.href = "/login";
   }

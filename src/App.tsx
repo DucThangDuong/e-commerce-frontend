@@ -1,26 +1,24 @@
 import "./App.css";
-import ProductPage from "./pages/FilterPage";
-import LandingPage from "./pages/HomePage";
-import CreateProductPage from "./pages/CreateProductPage";
-import ProductDetailsPage from "./pages/ProductDetailsPage";
-import CheckoutPage from "./pages/CheckoutPage";
-import UserProfilePage from "./pages/UserProfilePage";
+import TrashPage from "./pages/HomePage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import FilterPage from "./pages/FilterPage";
+import DetailPage from "./pages/DetailPage";
+import CartPage from "./pages/CartPage";
+import MainLayout from "./layouts/MainLayout";
 import {
   BrowserRouter,
   Routes,
   Route,
   Navigate,
   Outlet,
+  useLocation,
 } from "react-router-dom";
-import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPage";
 import { isLoggedIn } from "./untils/auth";
 import { useStore } from "./zustand/store";
+import "./css/home-page.css";
 import { useEffect } from "react";
-import { apiClient } from "./untils/apiClient";
-import type { UserProfilePrivate } from "./interfaces/customer";
-import ShoppingCartPage from "./pages/ShoppingCartPage";
-import OrderHistoryPage from "./pages/OrderHistoryPage";
+import { apiClient, getCookie, setCookie, removeCookie } from "./untils/apiClient";
 const ProtectedRoute = () => {
   const isAuth = isLoggedIn();
   if (!isAuth) {
@@ -29,34 +27,25 @@ const ProtectedRoute = () => {
   return <Outlet />;
 };
 const GuestRoute = () => {
-  const token = localStorage.getItem("accessToken");
+  const token = getCookie("accessToken");
   if (token) {
     return <Navigate to="/" replace />;
   }
   return <Outlet />;
 };
 
-const GlobalNotification = () => {
-  const notification = useStore((state) => state.notification);
-  if (!notification) return null;
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
 
-  return (
-    <div
-      className={`fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[9999] transition-all duration-300 ease-out
-         flex flex-col items-center justify-center gap-2 p-6 rounded-2xl bg-black/80 text-white shadow-2xl backdrop-blur-md
-          pointer-events-none text-center min-w-[200px] ${notification.visible
-          ? "opacity-100 scale-100"
-          : "opacity-0 scale-90"
-        }`}
-    >
-      <span
-        className={`material-symbols-outlined text-4xl ${notification.type === "error" ? "text-red-400" : "text-green-400"}`}
-      >
-        {notification.type === "error" ? "error" : "check_circle"}
-      </span>
-      <p className="font-bold text-lg">{notification.message}</p>
-    </div>
-  );
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "instant",
+    });
+  }, [pathname]);
+
+  return null;
 };
 
 function App() {
@@ -64,25 +53,25 @@ function App() {
   useEffect(() => {
     const initApp = async () => {
       try {
-        const token = localStorage.getItem("accessToken");
+        const token = getCookie("accessToken");
         if (token) {
-          const userData: UserProfilePrivate =
-            await apiClient.get("/customer/profile");
+          const response: any = await apiClient.get("/customer/profile");
+          const userData = response?.data ? response.data : response;
           setUser(userData);
           setIsLogin(true);
         } else {
           const data: { accessToken: string } =
             await apiClient.post("/refresh-token");
-          localStorage.setItem("accessToken", data.accessToken);
-          const userData: UserProfilePrivate =
-            await apiClient.get("/customer/profile");
+          setCookie("accessToken", data.accessToken);
+          const response: any = await apiClient.get("/customer/profile");
+          const userData = response?.data ? response.data : response;
           setUser(userData);
           setIsLogin(true);
         }
       } catch {
         setUser(null);
         setIsLogin(false);
-        localStorage.removeItem("accessToken");
+        removeCookie("accessToken");
       }
     };
 
@@ -90,23 +79,21 @@ function App() {
   }, [setUser, setIsLogin]);
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/categories" element={<ProductPage />} />
-        <Route path="/product/:id" element={<ProductDetailsPage />} />
-        <Route element={<GuestRoute />}>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-        </Route>
-        <Route element={<ProtectedRoute />}>
-          <Route path="/cart" element={<ShoppingCartPage />} />
-          <Route path="/checkout" element={<CheckoutPage />} />
-          <Route path="/create-product" element={<CreateProductPage />} />
-          <Route path="/profile" element={<UserProfilePage />} />
-          <Route path="/purchase" element={<OrderHistoryPage />} />
+        <Route element={<MainLayout />}>
+          <Route path="/" element={<TrashPage />} />
+          <Route path="/categories" element={<FilterPage />} />
+          <Route path="/product/:id" element={<DetailPage />} />
+          <Route element={<GuestRoute />}>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+          </Route>
+          <Route element={<ProtectedRoute />}>
+            <Route path="/cart" element={<CartPage />} />
+          </Route>
         </Route>
       </Routes>
-      <GlobalNotification />
     </BrowserRouter>
   );
 }

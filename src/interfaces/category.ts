@@ -1,6 +1,6 @@
-export interface Category {
-    categoryId: number;
-    name: string;
-    description: string;
-    picture: string;
+export interface ResCategoryDto {
+  categoryId: number;
+  name: string;
+  description?: string | null;
+  picture?: string | null;
 }

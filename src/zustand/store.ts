@@ -1,12 +1,12 @@
 import { create } from "zustand";
-import type { UserProfilePrivate } from "../interfaces/customer";
+import type { ResCustomerPrivateDto } from "../interfaces/customer";
 
 interface StoreState {
   // trạng thái đăng nhập
   isLogin: boolean;
   setIsLogin: (isLogin: boolean) => void;
-  user: UserProfilePrivate | null;
-  setUser: (user: UserProfilePrivate | null) => void;
+  user: ResCustomerPrivateDto | null;
+  setUser: (user: ResCustomerPrivateDto | null) => void;
   //signalR ID connection
   signalRConnectionId: string | null;
   setSignalRConnectionId: (connectionId: string | null) => void;

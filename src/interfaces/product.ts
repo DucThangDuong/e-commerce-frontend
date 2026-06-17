@@ -1,31 +1,44 @@
-import type { ReactNode } from "react";
-
-export interface ProductDTO {
-  productId: number;
-  name: string;
-  description: string;
-  categoryId: number;
-  basePrice: number;
+export interface ResProductColorDto {
+  colorId: number;
+  colorName: string;
+  priceAdjustment?: number | null;
   stockQuantity: number;
-  imageUrl: string[];
+  imageUrls?: string[] | null;
 }
 
-export interface CreateProductDTO {
+export interface ResProductDto {
+  productId: number;
+  categoryId: number;
+  brandId?: number | null;
   name: string;
-  description: string;
-  base_price: number;
-  stock_quantity: number;
-  category_id: number;
+  description?: string | null;
+  basePrice: number;
+  imageUrls?: string[] | null;
+  colors: ResProductColorDto[];
+  activePromotion?: { name: string; discountPercentage: number } | null;
+  specifications?: any[];
+  images?: any[];
 }
 
-export interface LayoutProps {
-  children: ReactNode;
+export interface FileUploadDto {
+  stream: any; // Stream is not a standard frontend type, maybe Blob or File if needed
+  fileName: string;
+  contentType: string;
 }
-export interface ProductFeatureDTO {
-  featuredId: number,
-  productId: number,
-  displayOrder: number,
-  startDate: Date,
-  endDate: Date,
-  product: ProductDTO
+
+export interface ResFeaturedProductDto {
+  featuredId: number;
+  productId: number;
+  displayOrder?: number | null;
+  startDate?: string | null; // DateTime maps to string in TS
+  endDate?: string | null;
+  product: ResProductDto;
+}
+
+export interface ResPagedProductDto {
+  totalItems: number;
+  totalPages: number;
+  currentPage: number;
+  pageSize: number;
+  products: ResProductDto[];
 }

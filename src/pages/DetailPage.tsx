@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { apiClient } from '../untils/apiClient';
 import { useStore } from '../zustand/store';
@@ -43,6 +43,15 @@ const DetailPage: React.FC = () => {
   // Custom Toast state
   const [showAddSuccess, setShowAddSuccess] = useState(false);
   const [fadeSuccess, setFadeSuccess] = useState(false);
+  
+  const [showAddError, setShowAddError] = useState(false);
+  const [fadeError, setFadeError] = useState(false);
+  const [addErrorMessage, setAddErrorMessage] = useState('');
+
+  const successTimeout1 = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const successTimeout2 = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const errorTimeout1 = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const errorTimeout2 = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { isLogin, showNotification } = useStore();
 
@@ -100,8 +109,18 @@ const DetailPage: React.FC = () => {
   const adjustQty = (change: number) => {
     if (!selectedColor || selectedColor.stockQuantity <= 0) return;
     const newQty = quantity + change;
-    const max = Math.min(selectedColor.stockQuantity, 10);
-    if (newQty >= 1 && newQty <= max) {
+    
+    if (newQty > 10) {
+      showNotification('Chỉ được mua tối đa 10 sản phẩm mỗi loại!', 'warning');
+      return;
+    }
+    
+    if (newQty > selectedColor.stockQuantity) {
+      showNotification(`Số lượng vượt quá sản phẩm hiện có (tối đa ${selectedColor.stockQuantity})!`, 'warning');
+      return;
+    }
+
+    if (newQty >= 1) {
       setQuantity(newQty);
     }
   };
@@ -118,6 +137,11 @@ const DetailPage: React.FC = () => {
       return;
     }
     
+    if (quantity > 10) {
+      showNotification('Chỉ được mua tối đa 10 sản phẩm mỗi loại!', 'warning');
+      return;
+    }
+
     if (quantity > selectedColor.stockQuantity) {
       showNotification(`Số lượng vượt quá sản phẩm hiện có (tối đa ${selectedColor.stockQuantity})!`, 'warning');
       return;
@@ -129,13 +153,25 @@ const DetailPage: React.FC = () => {
         quantity
       });
       
+      if (successTimeout1.current) clearTimeout(successTimeout1.current);
+      if (successTimeout2.current) clearTimeout(successTimeout2.current);
+
       setShowAddSuccess(true);
       setFadeSuccess(false);
-      setTimeout(() => setFadeSuccess(true), 1500); // Start fading after 1.5s
-      setTimeout(() => setShowAddSuccess(false), 2500); // Remove from DOM after 2.5s
+      successTimeout1.current = setTimeout(() => setFadeSuccess(true), 1500); // Start fading after 1.5s
+      successTimeout2.current = setTimeout(() => setShowAddSuccess(false), 2500); // Remove from DOM after 2.5s
       
     } catch (err: any) {
-      showNotification(err.response?.data?.message || 'Thêm vào giỏ hàng thất bại!', 'danger');
+      const errorMsg = err.message || 'Thêm vào giỏ hàng thất bại!';
+      setAddErrorMessage(errorMsg);
+      
+      if (errorTimeout1.current) clearTimeout(errorTimeout1.current);
+      if (errorTimeout2.current) clearTimeout(errorTimeout2.current);
+
+      setShowAddError(true);
+      setFadeError(false);
+      errorTimeout1.current = setTimeout(() => setFadeError(true), 1500);
+      errorTimeout2.current = setTimeout(() => setShowAddError(false), 2500);
     }
   };
 
@@ -434,6 +470,14 @@ const DetailPage: React.FC = () => {
         <div className={`fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-900/90 text-white px-8 py-6 rounded-2xl shadow-2xl z-[9999] flex flex-col items-center gap-3 transition-opacity duration-1000 ${fadeSuccess ? 'opacity-0' : 'opacity-100'}`}>
           <span className="material-symbols-outlined text-6xl text-green-400">check_circle</span>
           <span className="font-bold text-xl tracking-tight">Thêm thành công!</span>
+        </div>
+      )}
+
+      {/* Center Error Toast */}
+      {showAddError && (
+        <div className={`fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-900/90 text-white px-8 py-6 rounded-2xl shadow-2xl z-[9999] flex flex-col items-center gap-3 w-[80%] max-w-sm text-center transition-opacity duration-1000 ${fadeError ? 'opacity-0' : 'opacity-100'}`}>
+          <span className="material-symbols-outlined text-6xl text-red-500">error</span>
+          <span className="font-bold text-xl tracking-tight leading-tight">{addErrorMessage}</span>
         </div>
       )}
 

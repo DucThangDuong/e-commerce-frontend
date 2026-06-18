@@ -100,6 +100,8 @@ export const apiClient = {
   get: <T>(url: string) => axiosInstance.get<T>(url).then((res) => res.data),
   post: <T>(url: string, data: object = {}) =>
     axiosInstance.post<T>(url, data).then((res) => res.data),
+  postWithHeaders: <T>(url: string, data: object = {}, config: object = {}) =>
+    axiosInstance.post<T>(url, data, config).then((res) => res.data),
   put: <T>(url: string, data: object) =>
     axiosInstance.put<T>(url, data).then((res) => res.data),
   delete: <T>(url: string, data: object) =>

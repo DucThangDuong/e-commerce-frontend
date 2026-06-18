@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { apiClient } from '../untils/apiClient';
 import { useStore } from '../zustand/store';
@@ -14,8 +14,12 @@ const CartPage: React.FC = () => {
   const [cartItems, setCartItems] = useState<ResCartDto[]>([]);
   const [loading, setLoading] = useState(true);
   
-  // State for selected items: cartId -> boolean
   const [selectedItems, setSelectedItems] = useState<Record<number, boolean>>({});
+  
+  // State to track which item is asking for deletion confirmation
+  const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
+
+  const updateTimeoutRef = useRef<Record<number, NodeJS.Timeout>>({});
 
   const { isLogin, showNotification } = useStore();
   const navigate = useNavigate();
@@ -27,10 +31,8 @@ const CartPage: React.FC = () => {
       if (res && res.data) {
         setCartItems(res.data);
         
-        // Auto select all items by default
         const newSelected: Record<number, boolean> = {};
         res.data.forEach(item => {
-           // preserve existing selection if refetching
            newSelected[item.cartId] = selectedItems[item.cartId] !== undefined ? selectedItems[item.cartId] : true;
         });
         setSelectedItems(newSelected);
@@ -62,31 +64,57 @@ const CartPage: React.FC = () => {
     if (!item) return;
     
     const newQty = item.quantity + change;
-    if (newQty < 1) return;
+
+    if (newQty > 10) {
+       showNotification('Chỉ được mua tối đa 10 sản phẩm mỗi loại!', 'warning');
+       return;
+    }
+
     if (newQty > item.stockQuantity) {
        showNotification(`Số lượng vượt quá tồn kho (tối đa ${item.stockQuantity})`, 'warning');
        return;
     }
 
-    try {
-      const formData = new FormData();
-      formData.append('cartId', cartId.toString());
-      formData.append('quantity', newQty.toString());
-      
-      await apiClient.postForm<any>('/cart/update', formData);
-      // Update local state instead of reloading page for better UX
-      setCartItems(prev => prev.map(i => i.cartId === cartId ? { ...i, quantity: newQty } : i));
-    } catch (err: any) {
-      showNotification(err.response?.data?.message || 'Cập nhật số lượng thất bại!', 'danger');
+    // Pause and ask for confirmation if quantity reaches 0
+    if (newQty <= 0) {
+      setConfirmDeleteId(cartId);
+      return;
     }
+
+    // Hide confirm if they increase again
+    if (confirmDeleteId === cartId) {
+      setConfirmDeleteId(null);
+    }
+
+    // Update local state for immediate UX feedback
+    setCartItems(prev => prev.map(i => i.cartId === cartId ? { ...i, quantity: newQty } : i));
+
+    if (updateTimeoutRef.current[cartId]) {
+      clearTimeout(updateTimeoutRef.current[cartId]);
+    }
+
+    updateTimeoutRef.current[cartId] = setTimeout(async () => {
+      try {
+        const formData = new FormData();
+        formData.append('cartId', cartId.toString());
+        formData.append('quantity', newQty.toString());
+        
+        await apiClient.postForm<any>('/cart/update', formData);
+      } catch (err: any) {
+        showNotification(err.response?.data?.message || 'Cập nhật số lượng thất bại!', 'danger');
+        fetchCart(); // rollback on failure
+      }
+    }, 500);
   };
 
   const removeCartItem = async (cartId: number) => {
+    const item = cartItems.find(i => i.cartId === cartId);
+    if (!item) return;
+
     try {
-      await apiClient.deleteQuery(`/cart?colorId=${cartId}`);
+      await apiClient.deleteQuery(`/cart?colorId=${item.colorId}`);
       setCartItems(prev => prev.filter(i => i.cartId !== cartId));
       
-      // Remove from selection
       const newSelected = { ...selectedItems };
       delete newSelected[cartId];
       setSelectedItems(newSelected);
@@ -106,7 +134,6 @@ const CartPage: React.FC = () => {
     navigate(`/checkout?cartIds=${selectedIds.join(',')}`);
   };
 
-  // Calculations
   const getSingleItemPrice = (item: ResCartDto) => {
     const priceAdj = item.priceAdjustment || 0;
     const base = item.discountedPrice || item.basePrice;
@@ -185,7 +212,8 @@ const CartPage: React.FC = () => {
                                   : "https://via.placeholder.com/150";
 
                     return (
-                      <li key={cart.cartId} className="p-4 sm:p-6 flex items-center hover:bg-gray-50 transition-colors">
+                      <li key={cart.cartId} className="flex flex-col hover:bg-gray-50 transition-colors">
+                        <div className="p-4 sm:p-6 flex items-center">
                         {/* Checkbox */}
                         <div className="pr-4">
                           <input 
@@ -256,7 +284,34 @@ const CartPage: React.FC = () => {
                               <span className="material-symbols-outlined">delete</span>
                             </button>
                           </div>
+                          </div>
                         </div>
+
+                        {/* Confirmation Row Below Product */}
+                        {confirmDeleteId === cart.cartId && (
+                          <div className="bg-red-50/80 border-t border-red-100 px-4 py-3 sm:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-fade-in-down">
+                            <span className="text-red-600 font-medium text-sm flex items-center gap-2">
+                              <span className="material-symbols-outlined text-lg">warning</span>
+                              Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?
+                            </span>
+                            <div className="flex items-center gap-3 self-end sm:self-auto">
+                              <button 
+                                type="button" 
+                                onClick={() => setConfirmDeleteId(null)} 
+                                className="px-4 py-1.5 text-sm rounded-lg bg-white border border-gray-300 text-gray-700 font-bold hover:bg-gray-100 transition-colors"
+                              >
+                                Hủy
+                              </button>
+                              <button 
+                                type="button" 
+                                onClick={() => removeCartItem(cart.cartId)} 
+                                className="px-4 py-1.5 text-sm rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold shadow-sm transition-colors"
+                              >
+                                Xác nhận
+                              </button>
+                            </div>
+                          </div>
+                        )}
                       </li>
                     );
                   })}

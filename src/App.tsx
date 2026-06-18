@@ -5,6 +5,8 @@ import RegisterPage from "./pages/RegisterPage";
 import FilterPage from "./pages/FilterPage";
 import DetailPage from "./pages/DetailPage";
 import CartPage from "./pages/CartPage";
+import CheckoutPage from "./pages/CheckoutPage";
+import PurchasePage from "./pages/PurchasePage";
 import MainLayout from "./layouts/MainLayout";
 import {
   BrowserRouter,
@@ -91,6 +93,8 @@ function App() {
           </Route>
           <Route element={<ProtectedRoute />}>
             <Route path="/cart" element={<CartPage />} />
+            <Route path="/checkout" element={<CheckoutPage />} />
+            <Route path="/purchase" element={<PurchasePage />} />
           </Route>
         </Route>
       </Routes>

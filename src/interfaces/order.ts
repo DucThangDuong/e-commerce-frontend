@@ -29,7 +29,11 @@ export interface CartItemRequest {
 }
 
 export interface ValidatedCartItem {
-  // Add proper fields here based on your backend or reuse another interface if applicable
+  colorId: number;
+  quantity: number;
+  unitPrice: number;
+  lineTotal: number;
+  availableStock: number;
 }
 
 export interface ValidateCartResponse {
@@ -44,4 +48,25 @@ export interface CalculateOrderResponse {
   finalAmount: number;
   couponId?: number | null;
   couponCode?: string | null;
+}
+
+export interface ActiveCouponResponse {
+  code: string;
+  name: string;
+  discountType: string;
+  discountValue: number;
+  minOrderValue?: number | null;
+  remainingUsages?: number | null;
+  startDate: string;
+  endDate: string;
+}
+
+export interface ApplyCouponResponse {
+  subTotal: number;
+  discountAmount: number;
+  finalAmount: number;
+  couponCode: string;
+  couponName: string;
+  discountType: string;
+  discountValue: number;
 }

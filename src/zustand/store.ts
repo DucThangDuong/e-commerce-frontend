@@ -11,8 +11,8 @@ interface StoreState {
   signalRConnectionId: string | null;
   setSignalRConnectionId: (connectionId: string | null) => void;
   // thông báo toàn cục
-  notification: { message: string; visible: boolean; type: "success" | "error" } | null;
-  showNotification: (message: string, type?: "success" | "error") => void;
+  notification: { message: string; visible: boolean; type: "success" | "error" | "warning" | "danger" | "info" } | null;
+  showNotification: (message: string, type?: "success" | "error" | "warning" | "danger" | "info") => void;
   hideNotification: () => void;
 }
 

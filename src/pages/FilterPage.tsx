@@ -77,7 +77,7 @@ const FilterPage: React.FC = () => {
           }
           
           if (selectedBrandIds.length > 0) {
-            filtered = filtered.filter(p => selectedBrandIds.includes(p.brandId.toString()));
+            filtered = filtered.filter(p => p.brandId != null && selectedBrandIds.includes(p.brandId.toString()));
           }
           
           if (sort === 'price_asc') {

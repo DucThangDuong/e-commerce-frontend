@@ -13,3 +13,4 @@ export interface ResCartDto {
   priceAdjustment?: number;
   discountedPrice?: number;
   activePromotion?: any;
+}

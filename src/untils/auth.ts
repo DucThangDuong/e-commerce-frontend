@@ -1,6 +1,6 @@
 import { apiClient, getCookie, removeCookie } from "./apiClient";
 export const getToken = (): string | null => {
-  return getCookie("accessToken");
+  return getCookie("accessToken") || null;
 };
 
 export const isLoggedIn = (): boolean => {

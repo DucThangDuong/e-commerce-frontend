@@ -19,7 +19,7 @@ const CartPage: React.FC = () => {
   // State to track which item is asking for deletion confirmation
   const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
 
-  const updateTimeoutRef = useRef<Record<number, NodeJS.Timeout>>({});
+  const updateTimeoutRef = useRef<Record<number, ReturnType<typeof setTimeout>>>({});
 
   const { isLogin, showNotification } = useStore();
   const navigate = useNavigate();

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { apiClient } from '../untils/apiClient';
 import { useStore } from '../zustand/store';
 import type { ResProductDto, ResProductColorDto } from '../interfaces/product';

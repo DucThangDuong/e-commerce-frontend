@@ -48,11 +48,9 @@ const CheckoutPage: React.FC = () => {
   const shippingFee = subtotal > 0 ? 30000 : 0;
   
   // Calculate Grand Total
-  let discountAmount = 0;
   let finalSubtotal = subtotal;
   
   if (appliedCouponInfo) {
-    discountAmount = appliedCouponInfo.discountAmount;
     finalSubtotal = appliedCouponInfo.finalAmount;
   }
   

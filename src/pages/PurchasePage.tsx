@@ -11,7 +11,7 @@ interface ApiResponse<T> {
 }
 
 const PurchasePage: React.FC = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const currentTab = searchParams.get('tab') || 'pending';
   const { showNotification } = useStore();
 

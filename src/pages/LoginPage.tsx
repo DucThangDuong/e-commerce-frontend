@@ -3,7 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
 import { apiClient, setCookie } from '../untils/apiClient';
 import { useStore } from '../zustand/store';
-import type { LoginResponse } from '../interfaces/auth';
+
 
 interface ApiResponse<T> {
   success: boolean;

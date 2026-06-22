@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { apiClient } from '../untils/apiClient';
-import type { ResFeaturedProductDto } from '../interfaces/product';
 import type { ResCategoryDto } from '../interfaces/category';
 import type { ResBrandDto } from '../interfaces/brand';
 
@@ -11,11 +10,18 @@ interface ApiResponse<T> {
   data: T;
 }
 
-const TrashPage: React.FC = () => {
-  const [featuredProducts, setFeaturedProducts] = useState<ResFeaturedProductDto[]>([]);
+export interface ResSimpleFeaturedProductDto {
+  productId: number;
+  displayOrder?: number;
+  firstColorImageUrl?: string;
+}
+
+const HomePage: React.FC = () => {
+  const [featuredProducts, setFeaturedProducts] = useState<ResSimpleFeaturedProductDto[]>([]);
   const [categories, setCategories] = useState<ResCategoryDto[]>([]);
   const [brands, setBrands] = useState<ResBrandDto[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -25,12 +31,15 @@ const TrashPage: React.FC = () => {
         const [categoriesRes, brandsRes, featuredRes] = await Promise.allSettled([
           apiClient.get<ApiResponse<ResCategoryDto[]>>('/category'),
           apiClient.get<ApiResponse<ResBrandDto[]>>('/brand'),
-          apiClient.get<ApiResponse<ResFeaturedProductDto[]>>('/productfeature').catch(() => null)
+          apiClient.get<ApiResponse<ResSimpleFeaturedProductDto[]>>('/product/featured').catch(() => null)
         ]);
 
         if (categoriesRes.status === 'fulfilled' && categoriesRes.value?.data) setCategories(categoriesRes.value.data);
         if (brandsRes.status === 'fulfilled' && brandsRes.value?.data) setBrands(brandsRes.value.data);
-        if (featuredRes.status === 'fulfilled' && featuredRes.value?.data) setFeaturedProducts(featuredRes.value.data);
+        if (featuredRes.status === 'fulfilled' && featuredRes.value?.data) {
+           const sorted = featuredRes.value.data.sort((a, b) => (a.displayOrder || 99) - (b.displayOrder || 99));
+           setFeaturedProducts(sorted);
+        }
         
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -42,107 +51,101 @@ const TrashPage: React.FC = () => {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    if (featuredProducts.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentSlide(prev => (prev + 1) % featuredProducts.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [featuredProducts.length]);
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-[#f9f9f7]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#a63b00]"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#ea580c]"></div>
       </div>
     );
   }
 
-  // Use featured products from API, or fallback to the first normal product
-  const displayFeatured = featuredProducts.length > 0 ? featuredProducts : [];
+  const currentProduct = featuredProducts.length > 0 ? featuredProducts[currentSlide] : null;
 
   return (
     <main className="font-['Plus_Jakarta_Sans',sans-serif] bg-[#f9f9f7] text-[#1a1c1b]">
-      {/* Hero Section */}
-      <section className="relative flex flex-col items-center justify-center py-20 overflow-hidden min-h-[90vh]">
-        <div className="absolute top-0 left-0 w-full h-full z-0">
-          <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBKe73rN6J_dN9Dx8HuIuRgrSTRygjuC5O5qUTsgM59EFyi2k-QwPzSXkIyY1tJiFUUGvSwaitMXu9cupp-uimOzR-LdR-SgPyMxR1dM3zaUgnR1pgQrkrqWUVSmi9Dsi3mOmFmtQ2sTkNvuZjj4wMRj-VV8L8wzCty18H7-AOlken3Nc9saeRcRVjs18TQdFq9_b8fo_scXnY0Pp6Ku1S9zG-0pbetNguXMgnwGhAlZzEM_7k2IaSJ1CNoso6FU9vrRxl21sFCet4" alt="Scenic mountain road" className="w-full h-full object-cover opacity-50 mix-blend-luminosity" />
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-[#f9f9f7] via-[rgba(249,249,247,0.6)] to-[#f9f9f7]"></div>
+      <section className="relative w-full h-[600px] md:h-[700px] overflow-hidden bg-gray-900">
+        <div className="absolute inset-0 z-0">
+           <img src="https://imageshare13.blob.core.windows.net/logo/backgroup.webp" alt="Background" className="w-full h-full object-cover opacity-80" />
         </div>
-
-        {displayFeatured.length > 0 ? (
-          <div className="container mx-auto px-4 relative z-10 flex flex-col items-center text-center max-w-7xl">
-            {displayFeatured.slice(0, 1).map((featured, index) => (
-              <React.Fragment key={index}>
-                <div className="inline-flex items-center gap-2 bg-white/75 px-4 py-1.5 rounded-full mb-6 border shadow-sm backdrop-blur-sm">
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#a63b00] opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#a63b00]"></span>
-                  </span>
-                  <span className="font-medium uppercase text-[#594138] text-xs tracking-wider">Sản phẩm nổi bật</span>
-                </div>
-
-                <h1 className="text-5xl md:text-6xl font-bold mb-6">
-                  {featured.product.name}
-                </h1>
-                <p className="text-xl text-[#594138] mx-auto mb-10 max-w-2xl">
-                  {featured.product.description}
-                </p>
-
-                <div className="relative w-full flex items-center justify-center mb-12 max-w-4xl h-[400px]">
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/75 w-3/5 h-3/5 blur-[60px] z-0"></div>
-                  <div className="relative z-10 h-full w-3/4 flex items-center justify-center">
-                    <img 
-                      src={featured.product.imageUrls && featured.product.imageUrls.length > 0 ? featured.product.imageUrls[0] : "https://via.placeholder.com/400"} 
-                      alt={featured.product.name} 
-                      className="w-full h-full object-contain transition-transform duration-300 hover:-translate-y-2 drop-shadow-[0_20px_30px_rgba(0,0,0,0.15)]" 
-                    />
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap justify-center gap-4 z-20">
-                  <Link to={`/product/${featured.product.productId}`} className="rounded-full font-semibold px-8 py-4 bg-[#a63b00] text-white shadow-[0_4px_14px_0_rgba(166,59,0,0.1)] hover:bg-[#f26522] hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-2">
-                    Trải nghiệm ngay <span className="material-symbols-outlined text-lg">arrow_forward</span>
-                  </Link>
-                </div>
-              </React.Fragment>
-            ))}
-          </div>
-        ) : (
-          <div className="container mx-auto px-4 relative z-10 flex flex-col items-center text-center max-w-7xl">
-            <div className="inline-flex items-center gap-2 bg-white/75 px-4 py-1.5 rounded-full mb-6 border shadow-sm backdrop-blur-sm">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#a63b00] opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#a63b00]"></span>
-              </span>
-              <span className="font-medium uppercase text-[#594138] text-xs tracking-wider">Thế hệ mới 2026</span>
-            </div>
-
-            <h1 className="text-5xl md:text-6xl font-bold mb-6">
-              Đẳng cấp sống <br className="md:hidden" />
-              <span className="text-[#a63b00] italic">bền vững</span>
+        <div 
+          className="absolute inset-0 z-10 bg-[#06182c]"
+          style={{ clipPath: 'polygon(0 0, 60% 0, 40% 100%, 0 100%)' }}
+        ></div>
+        <div className="relative z-20 container mx-auto px-4 h-full flex items-center">
+          {/* Left Text Content */}
+          <div className="w-full md:w-[55%] text-white pt-20 md:pt-0 pl-0 md:pl-8 relative z-20">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+              XE MÁY - ĐAM MÊ XE,<br/> DẪN ĐẦU TỐC ĐỘ
             </h1>
-            <p className="text-xl text-[#594138] mx-auto mb-10 max-w-2xl">
-              Sự kết hợp hoàn hảo giữa thiết kế tinh giản, công nghệ hướng tương lai và trải nghiệm lái tĩnh tại. Định nghĩa lại sự tự do trong đô thị.
+            <p className="text-gray-300 text-lg md:text-xl mb-10 max-w-lg">
+              Hàng ngàn mẫu xe mới, phụ kiện chính hãng & dịch vụ bảo dưỡng chuyên nghiệp.
             </p>
-
-            <div className="relative w-full flex items-center justify-center mb-12 max-w-4xl h-[400px]">
-              <img src="https://i.pinimg.com/originals/ee/4e/b9/ee4eb95db689fe5a8529105f32fad80d.jpg" alt="Modern electric motorcycle" className="w-full h-full object-contain mix-blend-multiply transition-transform duration-300 hover:-translate-y-2" />
-            </div>
+            <Link 
+              to="/categories" 
+              className="inline-block bg-[#ea580c] text-white font-bold px-8 py-3 rounded hover:bg-[#c24100] transition-colors"
+            >
+              XEM TẤT CẢ XE
+            </Link>
           </div>
-        )}
+
+          {/* Right Image Content */}
+          <div className="absolute top-0 right-0 w-full md:w-[65%] h-full flex items-center justify-center mt-10 md:mt-0 z-30 pointer-events-none">
+             {currentProduct ? (
+               <Link to={`/product/${currentProduct.productId}`} className="w-full h-full flex items-center justify-center group relative cursor-pointer pointer-events-auto">
+                  <img 
+                    src={currentProduct.firstColorImageUrl || "https://via.placeholder.com/600x400?text=No+Image"} 
+                    alt="Featured Motorcycle" 
+                    className="relative w-[120%] md:w-[130%] h-auto max-h-[85%] object-contain transition-transform duration-500 mix-blend-multiply drop-shadow-2xl"
+                  />
+               </Link>
+             ) : (
+                <div className="text-white text-xl">Đang cập nhật...</div>
+             )}
+
+             {/* Slider Dots */}
+             {featuredProducts.length > 1 && (
+               <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2">
+                 {featuredProducts.map((_, idx) => (
+                   <button
+                     key={idx}
+                     onClick={() => setCurrentSlide(idx)}
+                     className={`w-3 h-3 rounded-full transition-colors ${idx === currentSlide ? 'bg-[#ea580c]' : 'bg-white/60 hover:bg-white'}`}
+                     aria-label={`Go to slide ${idx + 1}`}
+                   ></button>
+                 ))}
+               </div>
+             )}
+          </div>
+
+        </div>
       </section>
 
       {/* Explore Categories */}
-      <section className="py-20 bg-[#f4f4f2] border-b border-gray-200">
-        <div className="container mx-auto px-4 max-w-7xl">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4">Khám phá theo dòng xe</h2>
-            <p className="text-[#594138] mx-auto max-w-2xl text-lg">
-              Từ những chiếc xe số bền bỉ đến những mẫu phân khối lớn đầy sức mạnh, chúng tôi có mọi thứ bạn cần.
-            </p>
+      <section className="py-16 bg-[#f5f5f5]">
+        <div className="container mx-auto px-4 max-w-6xl">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl md:text-3xl font-bold uppercase text-gray-900 tracking-wide">DANH MỤC SẢN PHẨM</h2>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             {categories.map((category) => (
               <Link key={category.categoryId} to={`/categories?categoryIds=${category.categoryId}`} className="block group">
-                <div className="h-full rounded-2xl bg-white p-6 shadow-sm transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-lg flex flex-col items-center text-center border border-gray-100">
-                  <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4 bg-[#e9e2d0] text-[#4a4739] transition-colors duration-300 group-hover:bg-[#f26522] group-hover:text-white">
-                    <span className="material-symbols-outlined text-3xl">{category.categoryId % 2 === 0 ? 'motorcycle' : 'moped'}</span>
+                <div className="h-full rounded-2xl bg-white p-4 md:p-6 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-md flex flex-col items-center text-center">
+                  <div className="w-full h-24 md:h-32 mb-4 flex items-center justify-center">
+                    <img 
+                      src={category.picture || "https://via.placeholder.com/150?text=No+Image"} 
+                      alt={category.name} 
+                      className="max-w-full max-h-full object-contain transition-transform duration-300 group-hover:scale-105 mix-blend-multiply" 
+                    />
                   </div>
-                  <h3 className="font-bold uppercase mb-2 text-sm tracking-wide text-gray-900">{category.name}</h3>
-                  <p className="text-[#594138] text-xs leading-relaxed m-0">{category.description}</p>
+                  <h3 className="font-bold uppercase text-gray-800 text-sm md:text-base tracking-wider">{category.name}</h3>
                 </div>
               </Link>
             ))}
@@ -164,7 +167,7 @@ const TrashPage: React.FC = () => {
                   <Link key={brand.brandId} to={`/categories?brandIds=${brand.brandId}`} className="block group text-center cursor-pointer">
                     <div className="bg-[#f4f4f2] border border-gray-200 rounded-full shadow-sm flex items-center justify-center mb-3 overflow-hidden w-24 h-24 transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-md mx-auto">
                       {brand.logoUrl ? (
-                        <img src={brand.logoUrl} alt={brand.name} className="w-full h-full object-contain p-4" />
+                        <img src={brand.logoUrl} alt={brand.name} className="w-full h-full object-contain p-4 mix-blend-multiply" />
                       ) : (
                         <span className="font-bold text-[#594138] uppercase text-xs">{brand.name}</span>
                       )}
@@ -205,5 +208,4 @@ const TrashPage: React.FC = () => {
     </main>
   );
 };
-
-export default TrashPage;
+export default HomePage;

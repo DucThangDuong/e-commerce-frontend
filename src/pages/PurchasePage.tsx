@@ -23,6 +23,11 @@ const PurchasePage: React.FC = () => {
   const [address, setAddress] = useState('');
   const [phone, setPhone] = useState('');
 
+  // Cancel Order Modal State
+  const [orderToCancel, setOrderToCancel] = useState<number | null>(null);
+  const [cancelReason, setCancelReason] = useState<string>('');
+  const [otherReason, setOtherReason] = useState<string>('');
+
   const fetchOrders = async () => {
     try {
       setLoading(true);
@@ -52,12 +57,15 @@ const PurchasePage: React.FC = () => {
     fetchOrders();
   }, [currentTab]);
 
-  const handleCancelOrder = async (orderId: number) => {
-    if (!window.confirm('Bạn có chắc chắn muốn hủy đơn hàng này không?')) return;
+  const submitCancelOrder = async () => {
+    if (!orderToCancel) return;
     try {
-      // NOTE: Update API endpoint according to your backend
-      await apiClient.post(`/order/cancel`, { orderId });
+      const finalReason = cancelReason === 'Lý do khác' ? otherReason : cancelReason;
+      await apiClient.post(`/order/cancel`, { orderId: orderToCancel, reason: finalReason });
       showNotification('Đã hủy đơn hàng thành công', 'success');
+      setOrderToCancel(null);
+      setCancelReason('');
+      setOtherReason('');
       fetchOrders();
     } catch (err: any) {
       showNotification(err.response?.data?.message || 'Không thể hủy đơn hàng', 'danger');
@@ -221,7 +229,7 @@ const PurchasePage: React.FC = () => {
                       Cập nhật thông tin
                     </button>
                     <button 
-                      onClick={() => handleCancelOrder(order.orderId)}
+                      onClick={() => setOrderToCancel(order.orderId)}
                       className="px-5 py-2.5 bg-red-50 text-red-600 rounded-xl font-bold hover:bg-red-100 transition-colors text-sm"
                     >
                       Hủy đơn hàng
@@ -287,6 +295,92 @@ const PurchasePage: React.FC = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Cancel Order Modal */}
+      {orderToCancel && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-3xl shadow-xl w-full max-w-lg overflow-hidden animate-scale-up">
+            <div className="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-red-50/50">
+              <h3 className="font-bold text-lg text-gray-900">Bạn chắc chắn muốn hủy đơn hàng này chứ?</h3>
+              <button 
+                onClick={() => {
+                  setOrderToCancel(null);
+                  setCancelReason('');
+                  setOtherReason('');
+                }}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+            
+            <div className="p-6">
+              <p className="text-gray-600 text-sm mb-4">
+                Để giúp Gia Phát cải thiện dịch vụ, xin cho chúng tôi biết lý do bạn hủy đơn nhé (Không bắt buộc):
+              </p>
+              
+              <div className="flex flex-col gap-3 mb-4">
+                {[
+                  'Tôi muốn đổi sang dòng xe / màu xe khác.',
+                  'Tôi tìm thấy chỗ khác có giá tốt hơn.',
+                  'Phí vận chuyển quá cao / Thời gian giao quá lâu.',
+                  'Tôi gặp khó khăn ở khâu Thanh toán / Trả góp.',
+                  'Tôi chỉ đổi ý, không muốn mua nữa.',
+                  'Lý do khác'
+                ].map((reason) => (
+                  <label key={reason} className={`flex items-start gap-3 p-3 rounded-xl cursor-pointer border transition-all ${cancelReason === reason ? 'border-[#a63b00] bg-orange-50/30' : 'border-gray-200 hover:bg-gray-50'}`}>
+                    <div className={`mt-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${cancelReason === reason ? 'border-[#a63b00]' : 'border-gray-300'}`}>
+                      {cancelReason === reason && <div className="w-2.5 h-2.5 rounded-full bg-[#a63b00]"></div>}
+                    </div>
+                    <input 
+                      type="radio" 
+                      name="cancelReason" 
+                      value={reason} 
+                      className="hidden" 
+                      checked={cancelReason === reason}
+                      onChange={(e) => setCancelReason(e.target.value)}
+                    />
+                    <span className="text-sm font-medium text-gray-800">{reason}</span>
+                  </label>
+                ))}
+              </div>
+
+              {cancelReason === 'Lý do khác' && (
+                <div className="animate-fade-in-down mt-2">
+                  <textarea
+                    value={otherReason}
+                    onChange={(e) => setOtherReason(e.target.value)}
+                    placeholder="Vui lòng chia sẻ lý do của bạn (Không bắt buộc)..."
+                    className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#a63b00] focus:border-[#a63b00] outline-none transition-all text-sm resize-none"
+                    rows={3}
+                  ></textarea>
+                </div>
+              )}
+            </div>
+
+            <div className="px-6 py-4 border-t border-gray-100 flex flex-col-reverse sm:flex-row justify-end gap-3 bg-gray-50">
+              <button 
+                type="button" 
+                onClick={submitCancelOrder}
+                className="px-5 py-2.5 bg-white border border-red-200 text-red-600 rounded-xl font-bold hover:bg-red-50 transition-colors text-sm w-full sm:w-auto"
+              >
+                VẪN HỦY ĐƠN
+              </button>
+              <button 
+                type="button" 
+                onClick={() => {
+                  setOrderToCancel(null);
+                  setCancelReason('');
+                  setOtherReason('');
+                }}
+                className="px-5 py-2.5 bg-[#a63b00] text-white rounded-xl font-bold hover:bg-[#8a3100] shadow-sm transition-colors text-sm w-full sm:w-auto"
+              >
+                KHÔNG, TÔI SẼ SUY NGHĨ LẠI
+              </button>
+            </div>
           </div>
         </div>
       )}

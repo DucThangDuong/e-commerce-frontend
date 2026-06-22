@@ -39,6 +39,35 @@ const CheckoutPage: React.FC = () => {
   const [phone, setPhone] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('cod');
 
+  // Validation states
+  const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string }>({});
+  const [touched, setTouched] = useState<{ [key: string]: boolean }>({});
+
+  const validateField = (field: string, value: string) => {
+    let error = '';
+    if (field === 'address') {
+      if (!value.trim()) {
+        error = 'Vui lòng nhập địa chỉ';
+      }
+    } else if (field === 'phone') {
+      if (!value.trim()) {
+        error = 'Vui lòng nhập số điện thoại';
+      } else {
+        const phoneRegex = /^(0|\+84)[35789][0-9]{8}$/;
+        if (!phoneRegex.test(value.trim())) {
+          error = 'Số điện thoại không hợp lệ (10 số, bắt đầu 03,05,07,08,09)';
+        }
+      }
+    }
+    setFieldErrors(prev => ({ ...prev, [field]: error }));
+    return error === '';
+  };
+
+  const handleBlur = (field: string, value: string) => {
+    setTouched(prev => ({ ...prev, [field]: true }));
+    validateField(field, value);
+  };
+
   // Summary states
   const subtotal = validatedOrder ? validatedOrder.subTotal : checkoutItems.reduce((acc, item) => {
     const base = item.discountedPrice || item.basePrice;
@@ -154,13 +183,13 @@ const CheckoutPage: React.FC = () => {
 
   const handleCheckout = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!address || !phone) {
-      showNotification('Vui lòng điền đầy đủ địa chỉ và số điện thoại', 'warning');
-      return;
-    }
-    const phoneRegex = /^(0|\+84)[35789][0-9]{8}$/;
-    if (!phoneRegex.test(phone)) {
-      showNotification('Số điện thoại không hợp lệ (phải đủ 10 số và bắt đầu bằng 03,05,07,08,09)', 'warning');
+    
+    setTouched({ address: true, phone: true });
+    const isAddressValid = validateField('address', address);
+    const isPhoneValid = validateField('phone', phone);
+    
+    if (!isAddressValid || !isPhoneValid) {
+      showNotification('Vui lòng kiểm tra lại thông tin giao hàng', 'warning');
       return;
     }
 
@@ -213,6 +242,29 @@ const CheckoutPage: React.FC = () => {
 
     } catch (err: any) {
       console.error('Lỗi khi gọi API đặt hàng:', err);
+      const apiErrors = err.response?.data?.Errors || err.response?.data?.errors;
+      if (apiErrors && Array.isArray(apiErrors)) {
+        const newErrors: { [key: string]: string } = {};
+        apiErrors.forEach((errItem: any) => {
+          const field = errItem.field || errItem.name || errItem.Key || errItem.propertyName;
+          const msg = errItem.message || errItem.Message || errItem.Value || errItem.errorMessage;
+          if (field) {
+            const key = field.toLowerCase();
+            // Map API fields to UI fields
+            if (key.includes('address')) newErrors.address = msg;
+            else if (key.includes('phone')) newErrors.phone = msg;
+            else newErrors[key] = msg;
+          }
+        });
+        
+        if (Object.keys(newErrors).length > 0) {
+          setFieldErrors(prev => ({ ...prev, ...newErrors }));
+          setTouched(prev => ({ ...prev, address: true, phone: true }));
+          showNotification('Vui lòng kiểm tra lại các trường bị lỗi!', 'danger');
+          return;
+        }
+      }
+      
       showNotification(err.response?.data?.message || err.message || 'Đặt hàng thất bại!', 'danger');
     }
   };
@@ -283,20 +335,40 @@ const CheckoutPage: React.FC = () => {
                   <input 
                     type="text" 
                     value={address}
-                    onChange={(e) => setAddress(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#a63b00] focus:border-[#a63b00] outline-none transition-all"
+                    onChange={(e) => {
+                      setAddress(e.target.value);
+                      if (touched.address) validateField('address', e.target.value);
+                    }}
+                    onBlur={() => handleBlur('address', address)}
+                    className={`w-full px-4 py-3 rounded-xl border ${fieldErrors.address && touched.address ? 'border-red-500 focus:ring-red-500 focus:border-red-500 bg-red-50' : 'border-gray-300 focus:ring-[#a63b00] focus:border-[#a63b00]'} focus:ring-2 outline-none transition-all`}
                     placeholder="123 Đường Lê Lợi, Quận 1, TP. HCM"
                   />
+                  {fieldErrors.address && touched.address && (
+                    <p className="text-red-500 text-xs mt-1 font-medium flex items-center gap-1 animate-fade-in-down">
+                      <span className="material-symbols-outlined text-[14px]">error</span>
+                      {fieldErrors.address}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-gray-500 font-bold uppercase text-[0.65rem] tracking-wider mb-2">Số điện thoại</label>
                   <input 
                     type="tel" 
                     value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#a63b00] focus:border-[#a63b00] outline-none transition-all"
+                    onChange={(e) => {
+                      setPhone(e.target.value);
+                      if (touched.phone) validateField('phone', e.target.value);
+                    }}
+                    onBlur={() => handleBlur('phone', phone)}
+                    className={`w-full px-4 py-3 rounded-xl border ${fieldErrors.phone && touched.phone ? 'border-red-500 focus:ring-red-500 focus:border-red-500 bg-red-50' : 'border-gray-300 focus:ring-[#a63b00] focus:border-[#a63b00]'} focus:ring-2 outline-none transition-all`}
                     placeholder="0901234567"
                   />
+                  {fieldErrors.phone && touched.phone && (
+                    <p className="text-red-500 text-xs mt-1 font-medium flex items-center gap-1 animate-fade-in-down">
+                      <span className="material-symbols-outlined text-[14px]">error</span>
+                      {fieldErrors.phone}
+                    </p>
+                  )}
                 </div>
               </div>
             </section>

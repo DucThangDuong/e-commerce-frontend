@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { apiClient } from '../untils/apiClient';
 import { useStore } from '../zustand/store';
 import type { ResProductDto, ResProductColorDto } from '../interfaces/product';
@@ -26,6 +26,7 @@ interface CommentDto {
 
 const DetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [product, setProduct] = useState<ProductDetail | null>(null);
   const [comments, setComments] = useState<CommentDto[]>([]);
   const [loading, setLoading] = useState(true);
@@ -175,6 +176,54 @@ const DetailPage: React.FC = () => {
     }
   };
 
+  const handleBuyNow = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!isLogin) {
+      showNotification('Vui lòng đăng nhập để mua hàng!', 'warning');
+      return;
+    }
+    
+    if (!selectedColor) {
+      showNotification('Vui lòng chọn màu sắc!', 'warning');
+      return;
+    }
+    
+    if (quantity > 10) {
+      showNotification('Chỉ được mua tối đa 10 sản phẩm mỗi loại!', 'warning');
+      return;
+    }
+
+    if (quantity > selectedColor.stockQuantity) {
+      showNotification(`Số lượng vượt quá sản phẩm hiện có (tối đa ${selectedColor.stockQuantity})!`, 'warning');
+      return;
+    }
+
+    try {
+      await apiClient.post('/cart', {
+        color_id: selectedColor.colorId,
+        quantity
+      });
+      
+      // Lấy danh sách giỏ hàng để tìm cartId của sản phẩm vừa thêm
+      const cartRes = await apiClient.get<any>('/cart');
+      // Tùy theo cấu trúc interceptor, data có thể nằm ở cartRes.data hoặc cartRes
+      const cartItems = Array.isArray(cartRes?.data) ? cartRes.data : 
+                        (Array.isArray(cartRes) ? cartRes : []);
+                        
+      const addedItem = cartItems.find((item: any) => item.colorId === selectedColor.colorId);
+      
+      if (addedItem && addedItem.cartId) {
+        navigate(`/checkout?cartIds=${addedItem.cartId}`);
+      } else {
+        // Fallback nếu không tìm thấy
+        navigate('/cart');
+      }
+    } catch (err: any) {
+      const errorMsg = err.message || 'Thêm vào giỏ hàng thất bại!';
+      showNotification(errorMsg, 'danger');
+    }
+  };
+
   const handleReviewSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -225,7 +274,7 @@ const DetailPage: React.FC = () => {
         <main className="container mx-auto px-4 py-12 max-w-7xl">
 
           {/* Top Section */}
-          <div className="flex flex-col lg:flex-row items-center mb-20 pt-4 lg:pt-10">
+          <div className="flex flex-col lg:flex-row items-start mb-20 pt-4 lg:pt-10 lg:min-h-[620px]">
             <div className="w-full lg:w-1/3 lg:pl-12 order-2 lg:order-2 mt-10 lg:mt-0 z-10">
               <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-6 uppercase tracking-wider leading-tight">
                 {product.name}
@@ -297,10 +346,15 @@ const DetailPage: React.FC = () => {
                   </div>
                   
                   {!isOutOfStock ? (
-                    <button type="submit" className="flex-1 bg-[#a63b00] hover:bg-[#8a3100] text-white h-12 font-bold rounded-lg px-6 flex items-center justify-center gap-2 shadow-sm transition-colors uppercase tracking-wider">
-                      <span className="material-symbols-outlined">shopping_cart</span>
-                      Thêm vào giỏ hàng
-                    </button>
+                    <>
+                      <button type="submit" className="flex-1 bg-white border border-[#a63b00] text-[#a63b00] hover:bg-orange-50 h-12 font-bold rounded-lg px-2 lg:px-4 flex items-center justify-center gap-2 shadow-sm transition-colors uppercase tracking-wider text-sm whitespace-nowrap">
+                        <span className="material-symbols-outlined text-lg">shopping_cart</span>
+                        Thêm vào giỏ
+                      </button>
+                      <button type="button" onClick={handleBuyNow} className="flex-1 bg-[#a63b00] hover:bg-[#8a3100] text-white h-12 font-bold rounded-lg px-2 lg:px-4 flex items-center justify-center gap-2 shadow-sm transition-colors uppercase tracking-wider text-sm whitespace-nowrap">
+                        Mua ngay
+                      </button>
+                    </>
                   ) : (
                     <button type="button" disabled className="flex-1 bg-gray-400 text-white h-12 font-bold rounded-lg px-6 flex items-center justify-center gap-2 shadow-sm uppercase tracking-wider cursor-not-allowed">
                       <span className="material-symbols-outlined">remove_shopping_cart</span>
@@ -314,7 +368,7 @@ const DetailPage: React.FC = () => {
             <div className="w-full lg:w-2/3 order-1 lg:order-1 mb-10 lg:mb-0 relative">
                <div className="absolute inset-0 bg-gradient-to-tr from-gray-100 to-transparent rounded-full blur-3xl opacity-50 z-0"></div>
                <div className="w-full flex items-center justify-center h-[400px] lg:h-[600px]">
-                 <img src={activeImage || "https://via.placeholder.com/800"} alt={product.name} className="w-full h-full object-contain mix-blend-multiply transition-transform duration-500 hover:scale-105" />
+                 <img src={activeImage || "https://via.placeholder.com/800"} alt={product.name} className="max-w-full max-h-full object-contain mix-blend-multiply transition-opacity duration-300" />
                </div>
             </div>
           </div>

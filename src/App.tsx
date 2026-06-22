@@ -1,5 +1,5 @@
 import "./App.css";
-import TrashPage from "./pages/HomePage";
+import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import FilterPage from "./pages/FilterPage";
@@ -84,7 +84,7 @@ function App() {
       <ScrollToTop />
       <Routes>
         <Route element={<MainLayout />}>
-          <Route path="/" element={<TrashPage />} />
+          <Route path="/" element={<HomePage />} />
           <Route path="/categories" element={<FilterPage />} />
           <Route path="/product/:id" element={<DetailPage />} />
           <Route element={<GuestRoute />}>

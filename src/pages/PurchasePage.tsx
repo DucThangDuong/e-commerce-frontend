@@ -53,9 +53,21 @@ const PurchasePage: React.FC = () => {
     }
   };
 
+  const paymentStatus = searchParams.get('payment');
+  const orderIdParam = searchParams.get('orderId');
+
   useEffect(() => {
     fetchOrders();
-  }, [currentTab]);
+
+    if (paymentStatus === 'success') {
+      showNotification(`Thanh toán thành công cho đơn hàng #${orderIdParam}!`, 'success');
+      // Xóa params để không hiện lại khi refresh
+      window.history.replaceState({}, '', '/purchase?tab=completed');
+    } else if (paymentStatus === 'failed') {
+      showNotification(`Thanh toán thất bại hoặc đã bị hủy!`, 'danger');
+      window.history.replaceState({}, '', '/purchase?tab=pending');
+    }
+  }, [currentTab, paymentStatus, orderIdParam]);
 
   const submitCancelOrder = async () => {
     if (!orderToCancel) return;
@@ -98,7 +110,7 @@ const PurchasePage: React.FC = () => {
       case 'delivered':
       case 'completed': return <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-semibold">Hoàn thành</span>;
       case 'cancelled': return <span className="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-semibold">Đã hủy</span>;
-      default: return <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs font-semibold">{status}</span>;
+      default: return <span className="bg-gray-100 text-[#1a1c1b] px-2 py-1 rounded-full text-xs font-semibold">{status}</span>;
     }
   };
 
@@ -111,7 +123,7 @@ const PurchasePage: React.FC = () => {
         <div className="flex flex-col gap-2">
           <Link 
             to="?tab=pending" 
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${currentTab === 'pending' ? 'bg-orange-50 text-[#a63b00] font-bold shadow-sm' : 'text-gray-600 hover:bg-gray-100'}`}
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${currentTab === 'pending' ? 'bg-orange-50 text-[#a63b00] font-bold shadow-sm' : 'text-[#594138] hover:bg-gray-100'}`}
           >
             <span className="material-symbols-outlined">pending_actions</span>
             <span className="text-sm">Đơn hàng chờ xử lý</span>
@@ -121,14 +133,14 @@ const PurchasePage: React.FC = () => {
           </Link>
           <Link 
             to="?tab=completed" 
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${currentTab === 'completed' ? 'bg-orange-50 text-[#a63b00] font-bold shadow-sm' : 'text-gray-600 hover:bg-gray-100'}`}
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${currentTab === 'completed' ? 'bg-orange-50 text-[#a63b00] font-bold shadow-sm' : 'text-[#594138] hover:bg-gray-100'}`}
           >
             <span className="material-symbols-outlined">task_alt</span>
             <span className="text-sm">Đơn hàng đã hoàn thành</span>
           </Link>
           <Link 
             to="?tab=cancelled" 
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${currentTab === 'cancelled' ? 'bg-orange-50 text-[#a63b00] font-bold shadow-sm' : 'text-gray-600 hover:bg-gray-100'}`}
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${currentTab === 'cancelled' ? 'bg-orange-50 text-[#a63b00] font-bold shadow-sm' : 'text-[#594138] hover:bg-gray-100'}`}
           >
             <span className="material-symbols-outlined">cancel</span>
             <span className="text-sm">Đơn hàng đã hủy</span>
@@ -139,46 +151,46 @@ const PurchasePage: React.FC = () => {
       {/* Main Content */}
       <main className="flex-grow p-4 md:p-8">
         <header className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-black text-gray-900 mb-2 tracking-tight">
+          <h1 className="text-3xl md:text-4xl font-black text-[#1a1c1b] mb-2 tracking-tight">
             {currentTab === 'pending' ? 'Đơn hàng chờ xử lý' : currentTab === 'completed' ? 'Đơn hàng đã hoàn thành' : 'Đơn hàng đã hủy'}
           </h1>
-          <p className="text-gray-500 text-sm md:text-base max-w-2xl">
+          <p className="text-[#594138] text-sm md:text-base max-w-2xl">
             Lịch sử chi tiết của các lô hàng toàn cầu đã giao và kho lưu trữ đơn hàng.
           </p>
         </header>
 
         <div className="flex flex-col gap-6">
           {loading ? (
-             <div className="flex justify-center items-center py-20">
-               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#a63b00]"></div>
+             <div className="flex justify-center items-center py-12 md:py-20">
+               <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-[#a63b00]"></div>
              </div>
           ) : orders.length === 0 ? (
             <div className="text-center py-16 bg-white rounded-3xl border border-gray-100 shadow-sm">
               <span className="material-symbols-outlined text-gray-300 text-6xl mb-4">receipt_long</span>
-              <h4 className="text-xl text-gray-900 font-bold mb-2">Không có đơn hàng nào</h4>
-              <p className="text-gray-500 text-sm">Bạn chưa có đơn hàng nào trong mục này.</p>
+              <h4 className="text-xl text-[#1a1c1b] font-bold mb-2">Không có đơn hàng nào</h4>
+              <p className="text-[#594138] text-sm">Bạn chưa có đơn hàng nào trong mục này.</p>
             </div>
           ) : (
             orders.map(order => (
               <section key={order.orderId} className="bg-white border border-gray-100 rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
                 {/* Header */}
                 <div className="bg-gray-50/50 border-b border-gray-100 p-4 md:p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                  <div className="flex flex-wrap gap-6 md:gap-10">
+                  <div className="flex flex-wrap gap-6 md:gap-6 lg:gap-10">
                     <div>
-                      <p className="text-gray-500 font-bold uppercase text-[0.65rem] tracking-wider mb-1">Mã đơn hàng</p>
-                      <p className="font-bold text-gray-900 text-sm">#ORD-{order.orderId}</p>
+                      <p className="text-[#594138] font-bold uppercase text-[0.65rem] tracking-wider mb-1">Mã đơn hàng</p>
+                      <p className="font-bold text-[#1a1c1b] text-sm">#ORD-{order.orderId}</p>
                     </div>
                     <div>
-                      <p className="text-gray-500 font-bold uppercase text-[0.65rem] tracking-wider mb-1">Ngày mua</p>
-                      <p className="font-bold text-gray-900 text-sm">{order.orderDate ? new Date(order.orderDate).toLocaleString('vi-VN') : 'N/A'}</p>
+                      <p className="text-[#594138] font-bold uppercase text-[0.65rem] tracking-wider mb-1">Ngày mua</p>
+                      <p className="font-bold text-[#1a1c1b] text-sm">{order.orderDate ? new Date(order.orderDate).toLocaleString('vi-VN') : 'N/A'}</p>
                     </div>
                     <div>
-                      <p className="text-gray-500 font-bold uppercase text-[0.65rem] tracking-wider mb-1">Trạng thái</p>
+                      <p className="text-[#594138] font-bold uppercase text-[0.65rem] tracking-wider mb-1">Trạng thái</p>
                       {getStatusBadge(order.status)}
                     </div>
                   </div>
                   <div className="text-left md:text-right w-full md:w-auto">
-                    <p className="text-gray-500 font-bold uppercase text-[0.65rem] tracking-wider mb-1">Tổng đơn hàng</p>
+                    <p className="text-[#594138] font-bold uppercase text-[0.65rem] tracking-wider mb-1">Tổng đơn hàng</p>
                     <p className="text-xl font-black text-[#a63b00] m-0">{order.totalAmount?.toLocaleString('vi-VN')} VNĐ</p>
                   </div>
                 </div>
@@ -190,24 +202,24 @@ const PurchasePage: React.FC = () => {
                     return (
                       <div key={idx} className="bg-gray-50/50 p-4 rounded-2xl flex flex-col md:flex-row items-center gap-4 border border-gray-50">
                         <div className="rounded-xl overflow-hidden flex-shrink-0 w-20 h-24 bg-white border border-gray-100">
-                          <img className="w-full h-full object-cover" src={imgUrl} alt={item.name} />
+                          <img loading="lazy" decoding="async" className="w-full h-full object-cover" src={imgUrl} alt={item.name} />
                         </div>
                         <div className="flex-grow flex flex-col md:flex-row w-full justify-between items-center gap-4">
                           <div className="w-full md:w-2/5 text-center md:text-left">
-                            <h3 className="font-bold text-gray-900 text-sm mb-1">{item.name}</h3>
-                            <p className="text-gray-500 text-xs">Màu {item.colorName}</p>
+                            <h3 className="font-bold text-[#1a1c1b] text-sm mb-1">{item.name}</h3>
+                            <p className="text-[#594138] text-xs">Màu {item.colorName}</p>
                           </div>
                           <div className="w-full md:w-1/5 text-center">
-                            <p className="text-gray-500 text-xs mb-1">Giá mua</p>
-                            <p className="font-medium text-gray-900 text-sm">{item.unitPriceAtPurchase?.toLocaleString('vi-VN')} VNĐ</p>
+                            <p className="text-[#594138] text-xs mb-1">Giá mua</p>
+                            <p className="font-medium text-[#1a1c1b] text-sm">{item.unitPriceAtPurchase?.toLocaleString('vi-VN')} VNĐ</p>
                           </div>
                           <div className="w-full md:w-1/5 text-center">
-                            <p className="text-gray-500 text-xs mb-1">SL</p>
-                            <p className="font-medium text-gray-900 text-sm">{item.quantity}</p>
+                            <p className="text-[#594138] text-xs mb-1">SL</p>
+                            <p className="font-medium text-[#1a1c1b] text-sm">{item.quantity}</p>
                           </div>
                           <div className="w-full md:w-1/5 text-center md:text-right">
-                            <p className="text-gray-500 text-xs mb-1">Tổng con</p>
-                            <p className="font-bold text-gray-900 text-sm">{(item.unitPriceAtPurchase * item.quantity).toLocaleString('vi-VN')} VNĐ</p>
+                            <p className="text-[#594138] text-xs mb-1">Tổng con</p>
+                            <p className="font-bold text-[#1a1c1b] text-sm">{(item.unitPriceAtPurchase * item.quantity).toLocaleString('vi-VN')} VNĐ</p>
                           </div>
                         </div>
                       </div>
@@ -224,7 +236,7 @@ const PurchasePage: React.FC = () => {
                         setAddress(order.address || '');
                         setPhone(order.phoneNumber || '');
                       }}
-                      className="px-5 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-xl font-bold hover:bg-gray-50 transition-colors text-sm"
+                      className="px-5 py-2.5 bg-white border border-gray-300 text-[#1a1c1b] rounded-xl font-bold hover:bg-gray-50 transition-colors text-sm"
                     >
                       Cập nhật thông tin
                     </button>
@@ -247,10 +259,10 @@ const PurchasePage: React.FC = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
           <div className="bg-white rounded-3xl shadow-xl w-full max-w-md overflow-hidden animate-scale-up">
             <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
-              <h3 className="font-bold text-lg text-gray-900">Cập nhật thông tin giao hàng</h3>
+              <h3 className="font-bold text-lg text-[#1a1c1b]">Cập nhật thông tin giao hàng</h3>
               <button 
                 onClick={() => setSelectedOrder(null)}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
+                className="text-gray-400 hover:text-[#594138] transition-colors"
               >
                 <span className="material-symbols-outlined">close</span>
               </button>
@@ -258,7 +270,7 @@ const PurchasePage: React.FC = () => {
             <form onSubmit={handleUpdateInfo}>
               <div className="p-6 flex flex-col gap-4">
                 <div>
-                  <label className="block text-gray-500 font-bold uppercase text-[0.65rem] tracking-wider mb-2">Địa chỉ mới</label>
+                  <label className="block text-[#594138] font-bold uppercase text-[0.65rem] tracking-wider mb-2">Địa chỉ mới</label>
                   <input 
                     type="text" 
                     value={address}
@@ -268,7 +280,7 @@ const PurchasePage: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-gray-500 font-bold uppercase text-[0.65rem] tracking-wider mb-2">Số điện thoại mới</label>
+                  <label className="block text-[#594138] font-bold uppercase text-[0.65rem] tracking-wider mb-2">Số điện thoại mới</label>
                   <input 
                     type="tel" 
                     value={phone}
@@ -283,7 +295,7 @@ const PurchasePage: React.FC = () => {
                 <button 
                   type="button" 
                   onClick={() => setSelectedOrder(null)}
-                  className="px-5 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-xl font-bold hover:bg-gray-50 transition-colors text-sm"
+                  className="px-5 py-2.5 bg-white border border-gray-300 text-[#1a1c1b] rounded-xl font-bold hover:bg-gray-50 transition-colors text-sm"
                 >
                   Đóng
                 </button>
@@ -304,21 +316,21 @@ const PurchasePage: React.FC = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
           <div className="bg-white rounded-3xl shadow-xl w-full max-w-lg overflow-hidden animate-scale-up">
             <div className="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-red-50/50">
-              <h3 className="font-bold text-lg text-gray-900">Bạn chắc chắn muốn hủy đơn hàng này chứ?</h3>
+              <h3 className="font-bold text-lg text-[#1a1c1b]">Bạn chắc chắn muốn hủy đơn hàng này chứ?</h3>
               <button 
                 onClick={() => {
                   setOrderToCancel(null);
                   setCancelReason('');
                   setOtherReason('');
                 }}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
+                className="text-gray-400 hover:text-[#594138] transition-colors"
               >
                 <span className="material-symbols-outlined">close</span>
               </button>
             </div>
             
             <div className="p-6">
-              <p className="text-gray-600 text-sm mb-4">
+              <p className="text-[#594138] text-sm mb-4">
                 Để giúp Gia Phát cải thiện dịch vụ, xin cho chúng tôi biết lý do bạn hủy đơn nhé (Không bắt buộc):
               </p>
               
@@ -343,7 +355,7 @@ const PurchasePage: React.FC = () => {
                       checked={cancelReason === reason}
                       onChange={(e) => setCancelReason(e.target.value)}
                     />
-                    <span className="text-sm font-medium text-gray-800">{reason}</span>
+                    <span className="text-sm font-medium text-[#1a1c1b]">{reason}</span>
                   </label>
                 ))}
               </div>

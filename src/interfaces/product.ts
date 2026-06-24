@@ -6,6 +6,18 @@ export interface ResProductColorDto {
   imageUrls?: string[] | null;
 }
 
+export interface ResProductSpecificationDto {
+  specName: string;
+  specValue: string;
+}
+
+export interface ResProductPromotionDto {
+  promotionName: string;
+  discountType: string;
+  discountValue: number;
+  amountReduced: number;
+}
+
 export interface ResProductDto {
   productId: number;
   categoryId: number;
@@ -13,11 +25,11 @@ export interface ResProductDto {
   name: string;
   description?: string | null;
   basePrice: number;
+  discountedPrice: number;
+  appliedPromotion?: ResProductPromotionDto | null;
   imageUrls?: string[] | null;
   colors: ResProductColorDto[];
-  activePromotion?: { name: string; discountPercentage: number } | null;
-  specifications?: any[];
-  images?: any[];
+  specifications?: ResProductSpecificationDto[] | null;
 }
 
 export interface FileUploadDto {

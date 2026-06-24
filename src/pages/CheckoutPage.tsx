@@ -272,29 +272,29 @@ const CheckoutPage: React.FC = () => {
   if (loading) {
     return (
       <div className="pt-[56px] min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#a63b00]"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-[#a63b00]"></div>
       </div>
     );
   }
 
   return (
-    <div className="pt-[56px] bg-gray-50 font-['Plus_Jakarta_Sans',sans-serif] text-gray-900 min-h-screen flex flex-col overflow-x-hidden">
-      <main className="flex-grow container mx-auto py-12 px-4 max-w-7xl">
-        <div className="mb-10">
-          <h1 className="text-3xl font-black text-gray-900 mb-2 tracking-tight">Thanh toán</h1>
-          <p className="text-gray-500 text-sm">Vui lòng kiểm tra lại thông tin và xác nhận đơn hàng của bạn.</p>
+    <div className="pt-[56px] bg-gray-50 font-sans text-[#1a1c1b] min-h-screen flex flex-col overflow-x-hidden">
+      <main className="flex-grow container mx-auto py-8 md:py-12 px-4 max-w-7xl">
+        <div className="mb-6 md:mb-10">
+          <h1 className="text-2xl md:text-3xl font-black text-[#1a1c1b] mb-2 tracking-tight">Thanh toán</h1>
+          <p className="text-[#594138] text-sm">Vui lòng kiểm tra lại thông tin và xác nhận đơn hàng của bạn.</p>
         </div>
 
-        <form onSubmit={handleCheckout} className="flex flex-col lg:flex-row gap-10 items-start">
+        <form onSubmit={handleCheckout} className="flex flex-col lg:flex-row gap-6 lg:gap-10 items-start">
           
           {/* Left Column */}
-          <div className="w-full lg:w-3/5 flex flex-col gap-10">
+          <div className="w-full lg:w-3/5 flex flex-col gap-6 lg:gap-10">
             
             {/* 1. Kiểm tra đơn hàng */}
             <section>
               <div className="flex items-center gap-2 border-b border-gray-200 pb-3 mb-6">
                 <span className="material-symbols-outlined text-[#a63b00]">shopping_cart</span>
-                <h3 className="text-xl font-bold m-0">Kiểm tra đơn hàng</h3>
+                <h3 className="text-xl font-bold tracking-tight m-0">Kiểm tra đơn hàng</h3>
               </div>
               <div className="flex flex-col gap-4">
                 {checkoutItems.map(item => {
@@ -308,11 +308,11 @@ const CheckoutPage: React.FC = () => {
                   return (
                     <div key={item.cartId} className="flex items-center gap-4 p-4 bg-white rounded-2xl border border-gray-100 shadow-sm">
                       <div className="rounded-xl bg-gray-50 overflow-hidden flex-shrink-0 w-20 h-20 border border-gray-100">
-                        <img src={imgUrl} alt={item.name} className="w-full h-full object-cover" />
+                        <img loading="lazy" decoding="async" src={imgUrl} alt={item.name} className="w-full h-full object-cover" />
                       </div>
                       <div className="flex-grow min-w-0">
-                        <h4 className="font-bold text-gray-900 text-sm mb-1 truncate">{item.name} - {item.colorName}</h4>
-                        <p className="text-gray-500 text-xs">Số lượng: {item.quantity}</p>
+                        <h4 className="font-bold text-[#1a1c1b] text-sm mb-1 truncate">{item.name} - {item.colorName}</h4>
+                        <p className="text-[#594138] text-xs">Số lượng: {item.quantity}</p>
                       </div>
                       <div className="font-black text-[#a63b00] text-sm flex-shrink-0">
                         {lineTotal.toLocaleString('vi-VN')} VNĐ
@@ -327,11 +327,11 @@ const CheckoutPage: React.FC = () => {
             <section>
               <div className="flex items-center gap-2 border-b border-gray-200 pb-3 mb-6">
                 <span className="material-symbols-outlined text-[#a63b00]">location_on</span>
-                <h3 className="text-xl font-bold m-0">Thông tin giao hàng</h3>
+                <h3 className="text-xl font-bold tracking-tight m-0">Thông tin giao hàng</h3>
               </div>
               <div className="flex flex-col gap-5">
                 <div>
-                  <label className="block text-gray-500 font-bold uppercase text-[0.65rem] tracking-wider mb-2">Địa chỉ</label>
+                  <label className="block text-[#594138] font-bold uppercase text-[0.65rem] tracking-wider mb-2">Địa chỉ</label>
                   <input 
                     type="text" 
                     value={address}
@@ -351,7 +351,7 @@ const CheckoutPage: React.FC = () => {
                   )}
                 </div>
                 <div>
-                  <label className="block text-gray-500 font-bold uppercase text-[0.65rem] tracking-wider mb-2">Số điện thoại</label>
+                  <label className="block text-[#594138] font-bold uppercase text-[0.65rem] tracking-wider mb-2">Số điện thoại</label>
                   <input 
                     type="tel" 
                     value={phone}
@@ -377,7 +377,7 @@ const CheckoutPage: React.FC = () => {
             <section>
               <div className="flex items-center gap-2 border-b border-gray-200 pb-3 mb-6">
                 <span className="material-symbols-outlined text-[#a63b00]">payments</span>
-                <h3 className="text-xl font-bold m-0">Phương thức thanh toán</h3>
+                <h3 className="text-xl font-bold tracking-tight m-0">Phương thức thanh toán</h3>
               </div>
               <div className="flex flex-col gap-4">
                 
@@ -395,8 +395,8 @@ const CheckoutPage: React.FC = () => {
                     <div className="flex-grow flex items-center gap-4">
                       <span className="material-symbols-outlined text-gray-400 peer-checked:text-[#a63b00] text-3xl">payments</span>
                       <div>
-                        <span className="block font-bold text-gray-900 text-sm">Tiền mặt</span>
-                        <span className="block text-gray-500 text-xs mt-0.5">Thanh toán khi nhận xe (COD)</span>
+                        <span className="block font-bold text-[#1a1c1b] text-sm">Tiền mặt</span>
+                        <span className="block text-[#594138] text-xs mt-0.5">Thanh toán khi nhận xe (COD)</span>
                       </div>
                     </div>
                     <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'cod' ? 'border-[#a63b00]' : 'border-gray-300'}`}>
@@ -419,8 +419,8 @@ const CheckoutPage: React.FC = () => {
                     <div className="flex-grow flex items-center gap-4">
                       <span className="material-symbols-outlined text-gray-400 peer-checked:text-[#a63b00] text-3xl">account_balance</span>
                       <div>
-                        <span className="block font-bold text-gray-900 text-sm">Chuyển khoản (VNPAY)</span>
-                        <span className="block text-gray-500 text-xs mt-0.5">Thanh toán an toàn qua cổng VNPAY</span>
+                        <span className="block font-bold text-[#1a1c1b] text-sm">Chuyển khoản (VNPAY)</span>
+                        <span className="block text-[#594138] text-xs mt-0.5">Thanh toán an toàn qua cổng VNPAY</span>
                       </div>
                     </div>
                     <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'vnpay' ? 'border-[#a63b00]' : 'border-gray-300'}`}>
@@ -433,11 +433,11 @@ const CheckoutPage: React.FC = () => {
                 {paymentMethod === 'vnpay' && (
                   <div className="p-4 border rounded-2xl flex flex-col md:flex-row items-center md:items-start gap-4 mt-2 bg-blue-50 border-blue-100 animate-fade-in-down">
                     <div className="bg-white rounded-xl p-2 shadow-sm border border-gray-100 flex items-center justify-center flex-shrink-0 w-16 h-16">
-                      <img src="https://vinadesign.vn/uploads/images/2023/05/vnpay-logo-vinadesign-25-12-57-55.jpg" alt="VNPAY Logo" className="w-full h-full object-contain" />
+                      <img loading="lazy" decoding="async" src="https://vinadesign.vn/uploads/images/2023/05/vnpay-logo-vinadesign-25-12-57-55.jpg" alt="VNPAY Logo" className="w-full h-full object-contain" />
                     </div>
                     <div className="text-center md:text-left">
-                      <h4 className="font-bold text-gray-900 text-sm m-0">Thanh toán trực tuyến an toàn</h4>
-                      <p className="text-gray-600 text-xs mt-1.5 leading-relaxed">
+                      <h4 className="font-bold text-[#1a1c1b] text-sm m-0">Thanh toán trực tuyến an toàn</h4>
+                      <p className="text-[#594138] text-xs mt-1.5 leading-relaxed">
                         Sau khi nhấn <strong>"Xác nhận đặt hàng"</strong>, hệ thống sẽ tự động chuyển hướng bạn qua cổng thanh toán <strong>VNPAY</strong> để hoàn tất.
                       </p>
                     </div>
@@ -453,7 +453,7 @@ const CheckoutPage: React.FC = () => {
               
               {/* Mã giảm giá */}
               <div className="flex flex-col gap-2">
-                <label className="text-gray-500 font-bold uppercase text-[0.65rem] tracking-wider">Mã giảm giá</label>
+                <label className="text-[#594138] font-bold uppercase text-[0.65rem] tracking-wider">Mã giảm giá</label>
                 <div className="flex gap-2 w-full">
                   <select 
                     value={selectedCoupon}
@@ -492,9 +492,9 @@ const CheckoutPage: React.FC = () => {
                 <div className="p-4 border border-green-200 bg-green-50 rounded-2xl animate-fade-in-down">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="material-symbols-outlined text-green-600 text-lg">local_offer</span>
-                    <span className="font-bold text-gray-900 text-sm uppercase">{appliedCouponInfo.couponCode}</span>
+                    <span className="font-bold text-[#1a1c1b] text-sm uppercase">{appliedCouponInfo.couponCode}</span>
                   </div>
-                  <div className="flex flex-col gap-1 text-xs text-gray-600">
+                  <div className="flex flex-col gap-1 text-xs text-[#594138]">
                     <div className="flex justify-between">
                       <span className="font-medium">Mã ưu đãi:</span>
                       <span>{appliedCouponInfo.couponName}</span>
@@ -511,9 +511,9 @@ const CheckoutPage: React.FC = () => {
 
               {/* Tính tiền */}
               <div className="flex flex-col gap-4 text-sm mt-2">
-                <div className="flex justify-between text-gray-500">
+                <div className="flex justify-between text-[#594138]">
                   <span>Tạm tính</span>
-                  <span className="font-medium text-gray-900">{subtotal.toLocaleString('vi-VN')} VNĐ</span>
+                  <span className="font-medium text-[#1a1c1b]">{subtotal.toLocaleString('vi-VN')} VNĐ</span>
                 </div>
                 {appliedCouponInfo && (
                   <div className="flex justify-between text-green-600">
@@ -521,23 +521,23 @@ const CheckoutPage: React.FC = () => {
                     <span className="font-bold">-{appliedCouponInfo.discountAmount.toLocaleString('vi-VN')} VNĐ</span>
                   </div>
                 )}
-                <div className="flex justify-between text-gray-500">
+                <div className="flex justify-between text-[#594138]">
                   <span>Phí vận chuyển</span>
                   {shippingFee === 0 ? (
                     <span className="text-green-600 font-bold">Miễn phí</span>
                   ) : (
-                    <span className="font-medium text-gray-900">{shippingFee.toLocaleString('vi-VN')} VNĐ</span>
+                    <span className="font-medium text-[#1a1c1b]">{shippingFee.toLocaleString('vi-VN')} VNĐ</span>
                   )}
                 </div>
-                <div className="flex justify-between text-gray-500">
+                <div className="flex justify-between text-[#594138]">
                   <span>Thuế ước tính</span>
-                  <span className="font-medium text-gray-900">0 VNĐ</span>
+                  <span className="font-medium text-[#1a1c1b]">0 VNĐ</span>
                 </div>
 
                 <hr className="border-gray-100 my-2" />
 
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-900 font-bold text-base">Tổng cộng</span>
+                  <span className="text-[#1a1c1b] font-bold text-base">Tổng cộng</span>
                   <span className="text-[#a63b00] font-black text-2xl">{grandTotal.toLocaleString('vi-VN')} VNĐ</span>
                 </div>
               </div>

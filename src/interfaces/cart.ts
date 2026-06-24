@@ -1,3 +1,5 @@
+import type { ResProductPromotionDto } from './product';
+
 export interface ResCartDto {
   cartId: number;
   productId: number;
@@ -8,9 +10,8 @@ export interface ResCartDto {
   name: string;
   description?: string | null;
   basePrice: number;
+  discountedPrice: number;
+  appliedPromotion?: ResProductPromotionDto | null;
   stockQuantity: number;
   imageUrl?: string[] | null;
-  priceAdjustment?: number;
-  discountedPrice?: number;
-  activePromotion?: any;
 }

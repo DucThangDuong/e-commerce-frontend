@@ -81,17 +81,9 @@ const FilterPage: React.FC = () => {
           }
           
           if (sort === 'price_asc') {
-            filtered.sort((a, b) => {
-              const priceA = a.activePromotion ? a.basePrice - (a.basePrice * a.activePromotion.discountPercentage / 100) : a.basePrice;
-              const priceB = b.activePromotion ? b.basePrice - (b.basePrice * b.activePromotion.discountPercentage / 100) : b.basePrice;
-              return priceA - priceB;
-            });
+            filtered.sort((a, b) => a.discountedPrice - b.discountedPrice);
           } else if (sort === 'price_desc') {
-            filtered.sort((a, b) => {
-              const priceA = a.activePromotion ? a.basePrice - (a.basePrice * a.activePromotion.discountPercentage / 100) : a.basePrice;
-              const priceB = b.activePromotion ? b.basePrice - (b.basePrice * b.activePromotion.discountPercentage / 100) : b.basePrice;
-              return priceB - priceA;
-            });
+            filtered.sort((a, b) => b.discountedPrice - a.discountedPrice);
           }
 
           setProducts(filtered);
@@ -160,9 +152,9 @@ const FilterPage: React.FC = () => {
   };
 
   return (
-    <div className="bg-[#f9f9f7] text-gray-900 font-['Plus_Jakarta_Sans',sans-serif] min-h-screen flex flex-col overflow-x-hidden pt-[56px]">
+    <div className="bg-[#f9f9f7] text-[#1a1c1b] font-sans min-h-screen flex flex-col overflow-x-hidden pt-[56px]">
       <div className="flex-grow relative">
-        <main className="container mx-auto px-4 py-12 max-w-7xl">
+        <main className="container mx-auto px-4 py-8 md:py-12 max-w-7xl">
           <div className="flex flex-col lg:flex-row gap-8 items-start">
             
             {/* Sidebar */}
@@ -170,16 +162,16 @@ const FilterPage: React.FC = () => {
               <div className="flex flex-col gap-8 bg-white p-6 border border-gray-200 rounded-2xl shadow-sm">
 
                 <div>
-                  <h3 className="uppercase text-xl font-bold m-0">Bộ lọc</h3>
+                  <h3 className="uppercase text-xl font-bold tracking-tight m-0">Bộ lọc</h3>
                 </div>
 
                 <div>
-                  <h4 className="text-gray-500 uppercase font-bold mb-4 text-xs tracking-widest">
+                  <h4 className="text-[#594138] uppercase font-bold mb-4 text-xs tracking-widest">
                     Loại xe
                   </h4>
                   <div className="flex flex-col gap-3">
                     {categories.map(cat => (
-                      <label key={cat.categoryId} className="flex justify-between items-center text-gray-600 cursor-pointer hover:text-gray-900 transition-colors">
+                      <label key={cat.categoryId} className="flex justify-between items-center text-[#594138] cursor-pointer hover:text-[#1a1c1b] transition-colors">
                         <span className="text-sm font-bold uppercase">{cat.name}</span>
                         <input 
                           type="checkbox" 
@@ -193,12 +185,12 @@ const FilterPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <h4 className="text-gray-500 uppercase font-bold mb-4 text-xs tracking-widest">
+                  <h4 className="text-[#594138] uppercase font-bold mb-4 text-xs tracking-widest">
                     Hãng xe
                   </h4>
                   <div className="flex flex-col gap-3">
                     {brands.map(brand => (
-                      <label key={brand.brandId} className="flex justify-between items-center text-gray-600 cursor-pointer hover:text-gray-900 transition-colors">
+                      <label key={brand.brandId} className="flex justify-between items-center text-[#594138] cursor-pointer hover:text-[#1a1c1b] transition-colors">
                         <span className="text-sm font-bold uppercase">{brand.name}</span>
                         <input 
                           type="checkbox" 
@@ -215,7 +207,7 @@ const FilterPage: React.FC = () => {
                   <button 
                     type="button" 
                     onClick={resetFilters} 
-                    className="w-full py-3 rounded-xl uppercase border border-gray-200 bg-gray-50 text-gray-900 font-bold hover:bg-[#a63b00] hover:text-white hover:border-[#a63b00] transition-colors"
+                    className="w-full py-3 rounded-xl uppercase border border-gray-200 bg-gray-50 text-[#1a1c1b] font-bold hover:bg-[#a63b00] hover:text-white hover:border-[#a63b00] transition-colors"
                   >
                     Làm mới bộ lọc
                   </button>
@@ -229,13 +221,13 @@ const FilterPage: React.FC = () => {
 
               <header className="flex justify-end mb-6 border-b border-gray-200 pb-4">
                 <div className="flex items-center gap-2 bg-white px-4 py-2 border border-gray-200 rounded-lg shadow-sm">
-                  <span className="uppercase font-bold text-gray-500 text-xs tracking-wider">
+                  <span className="uppercase font-bold text-[#594138] text-xs tracking-wider">
                     Lọc theo:
                   </span>
                   <select 
                     value={sort}
                     onChange={handleSortChange}
-                    className="border-0 focus:ring-0 uppercase font-bold text-xs cursor-pointer bg-transparent text-gray-900 p-0"
+                    className="border-0 focus:ring-0 uppercase font-bold text-xs cursor-pointer bg-transparent text-[#1a1c1b] p-0"
                   >
                     <option value="price_asc">Giá: Thấp đến Cao</option>
                     <option value="price_desc">Giá: Cao đến Thấp</option>
@@ -244,24 +236,22 @@ const FilterPage: React.FC = () => {
               </header>
 
               {loading ? (
-                <div className="flex justify-center py-20">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#a63b00]"></div>
+                <div className="flex justify-center py-12 md:py-20">
+                  <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-[#a63b00]"></div>
                 </div>
               ) : products.length === 0 ? (
-                <div className="py-20 text-center flex flex-col items-center justify-center text-gray-500">
+                <div className="py-12 md:py-20 text-center flex flex-col items-center justify-center text-[#594138]">
                   <span className="material-symbols-outlined text-6xl mb-4 text-gray-300">
                     inventory_2
                   </span>
-                  <p className="font-bold text-gray-900 text-lg">
+                  <p className="font-bold text-[#1a1c1b] text-lg">
                     Không tìm thấy sản phẩm nào phù hợp với bộ lọc
                   </p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {products.map(product => {
-                    const discountedPrice = product.activePromotion 
-                      ? product.basePrice - (product.basePrice * product.activePromotion.discountPercentage / 100) 
-                      : product.basePrice;
+                    const discountedPrice = product.discountedPrice;
 
                     const firstColorImage = product.colors && product.colors.length > 0 && product.colors[0].imageUrls && product.colors[0].imageUrls.length > 0 
                       ? product.colors[0].imageUrls[0] 
@@ -270,13 +260,13 @@ const FilterPage: React.FC = () => {
 
                     return (
                       <div key={product.productId} className="h-full bg-white border border-gray-100 shadow-sm rounded-2xl overflow-hidden relative flex flex-col transition-all hover:shadow-lg hover:-translate-y-1 group">
-                        {product.activePromotion && (
-                          <div className="absolute top-4 right-4 z-10 bg-red-600 text-white shadow-sm px-3 py-1.5 rounded-full font-bold text-[10px] uppercase tracking-wide">
-                            {product.activePromotion.name}
+                        {product.appliedPromotion && (
+                          <div className="absolute top-4 right-4 z-10 bg-red-600 text-white shadow-sm px-3 py-1.5 rounded-xl font-bold text-[10px] uppercase tracking-wide">
+                            {product.appliedPromotion.promotionName}
                           </div>
                         )}
                         <div className="h-[220px] overflow-hidden p-4 bg-gray-50 flex items-center justify-center">
-                          <img 
+                          <img loading="lazy" decoding="async" 
                             src={displayImage} 
                             alt={product.name} 
                             className="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-300" 
@@ -284,25 +274,25 @@ const FilterPage: React.FC = () => {
                         </div>
                         <div className="flex flex-col p-6 flex-grow">
                           <div className="flex justify-between items-center mb-3">
-                            <span className="bg-gray-100 text-gray-600 border border-gray-200 font-bold uppercase px-2 py-1 rounded text-[10px]">
+                            <span className="bg-gray-100 text-[#594138] border border-gray-200 font-bold uppercase px-2 py-1 rounded text-[10px]">
                               {categories.find(c => c.categoryId === product.categoryId)?.name || 'Category'}
                             </span>
                             <span className="text-gray-400 font-bold uppercase text-[10px] tracking-wider">
                               {brands.find(b => b.brandId === product.brandId)?.name || 'Brand'}
                             </span>
                           </div>
-                          <h5 className="font-extrabold text-lg text-gray-900 mb-2 leading-tight">
+                          <h5 className="font-extrabold text-lg text-[#1a1c1b] mb-2 leading-tight">
                             {product.name}
                           </h5>
-                          <p className="text-gray-500 mb-6 flex-grow text-sm leading-relaxed line-clamp-2">
+                          <p className="text-[#594138] mb-6 flex-grow text-sm leading-relaxed line-clamp-2">
                             {product.description}
                           </p>
                           <div className="flex justify-between items-end mt-auto pt-4 border-t border-gray-100">
                             <div>
                               <span className="block text-gray-400 uppercase font-bold mb-1 text-[10px] tracking-wider">Giá bán</span>
-                              {product.activePromotion ? (
+                              {product.appliedPromotion ? (
                                 <div>
-                                  <span className="text-gray-400 line-through block text-xs mb-0.5">
+                                  <span className="text-[#594138] line-through block text-xs mb-0.5">
                                     {product.basePrice.toLocaleString('vi-VN')} ₫
                                   </span>
                                   <span className="font-black text-xl text-[#a63b00]">
@@ -310,7 +300,7 @@ const FilterPage: React.FC = () => {
                                   </span>
                                 </div>
                               ) : (
-                                <span className="font-black text-xl text-gray-900">
+                                <span className="font-black text-xl text-[#1a1c1b]">
                                   {product.basePrice.toLocaleString('vi-VN')} ₫
                                 </span>
                               )}
@@ -329,12 +319,12 @@ const FilterPage: React.FC = () => {
               {/* Pagination Controls */}
               {pagination.totalPages > 1 && (
                 <div className="mt-12 flex flex-col sm:flex-row items-center justify-between border-t border-gray-200 pt-6 gap-4">
-                  <div className="flex items-center gap-2 text-sm text-gray-500 font-medium">
+                  <div className="flex items-center gap-2 text-sm text-[#594138] font-medium">
                     <span>Hiển thị</span>
                     <select 
                       value={pageSizeParam}
                       onChange={(e) => handlePageSizeChange(Number(e.target.value))}
-                      className="border border-gray-300 rounded px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-[#a63b00] font-bold text-gray-700 cursor-pointer"
+                      className="border border-gray-300 rounded px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-[#a63b00] font-bold text-[#1a1c1b] cursor-pointer"
                     >
                       <option value={8}>8</option>
                       <option value={12}>12</option>
@@ -348,19 +338,19 @@ const FilterPage: React.FC = () => {
                     <button 
                       onClick={() => handlePageChange(pagination.currentPage - 1)}
                       disabled={pagination.currentPage <= 1}
-                      className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed font-bold text-sm transition-colors text-gray-700"
+                      className="px-4 py-2 border border-gray-300 rounded-xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed font-bold text-sm transition-colors text-[#1a1c1b]"
                     >
                       Trước
                     </button>
                     
-                    <span className="text-sm font-bold text-gray-700 px-4">
+                    <span className="text-sm font-bold text-[#1a1c1b] px-4">
                       Trang {pagination.currentPage} / {pagination.totalPages}
                     </span>
 
                     <button 
                       onClick={() => handlePageChange(pagination.currentPage + 1)}
                       disabled={pagination.currentPage >= pagination.totalPages}
-                      className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed font-bold text-sm transition-colors text-gray-700"
+                      className="px-4 py-2 border border-gray-300 rounded-xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed font-bold text-sm transition-colors text-[#1a1c1b]"
                     >
                       Tiếp
                     </button>

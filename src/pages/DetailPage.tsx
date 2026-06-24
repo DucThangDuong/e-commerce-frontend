@@ -242,7 +242,7 @@ const DetailPage: React.FC = () => {
   if (loading) {
     return (
       <div className="min-h-screen pt-[56px] flex justify-center items-center bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#a63b00]"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-[#a63b00]"></div>
       </div>
     );
   }
@@ -250,16 +250,14 @@ const DetailPage: React.FC = () => {
   if (!product) {
     return (
       <div className="min-h-screen pt-[56px] flex justify-center items-center bg-gray-50">
-        <h2 className="text-2xl font-bold text-gray-700">Sản phẩm không tồn tại</h2>
+        <h2 className="text-2xl font-bold tracking-tight text-[#1a1c1b]">Sản phẩm không tồn tại</h2>
       </div>
     );
   }
 
   const basePrice = product.basePrice;
   const priceAdj = selectedColor?.priceAdjustment || 0;
-  const discountedPrice = product.activePromotion 
-    ? basePrice - (basePrice * product.activePromotion.discountPercentage / 100) 
-    : basePrice;
+  const discountedPrice = product.discountedPrice;
     
   const finalPrice = discountedPrice + priceAdj;
   const finalOriginalPrice = basePrice + priceAdj;
@@ -269,14 +267,14 @@ const DetailPage: React.FC = () => {
   const galleryImages: string[] = product.imageUrls ? [...product.imageUrls] : [];
 
   return (
-    <div className="pt-[56px] bg-[#f9f9f7] font-['Plus_Jakarta_Sans',sans-serif] text-gray-900 min-h-screen flex flex-col overflow-x-hidden">
+    <div className="pt-[56px] bg-[#f9f9f7] font-sans text-[#1a1c1b] min-h-screen flex flex-col overflow-x-hidden">
       <div className="flex-grow">
-        <main className="container mx-auto px-4 py-12 max-w-7xl">
+        <main className="container mx-auto px-4 py-8 md:py-12 max-w-7xl">
 
           {/* Top Section */}
           <div className="flex flex-col lg:flex-row items-start mb-20 pt-4 lg:pt-10 lg:min-h-[620px]">
             <div className="w-full lg:w-1/3 lg:pl-12 order-2 lg:order-2 mt-10 lg:mt-0 z-10">
-              <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-6 uppercase tracking-wider leading-tight">
+              <h1 className="text-4xl md:text-5xl font-black text-[#1a1c1b] mb-6 uppercase tracking-wider leading-tight">
                 {product.name}
               </h1>
               <h2 className="text-[#a63b00] italic font-black uppercase mb-8 text-2xl tracking-wider">
@@ -284,14 +282,14 @@ const DetailPage: React.FC = () => {
               </h2>
               
               {/* Colors */}
-              <div className="flex flex-wrap gap-6 mb-10">
+              <div className="flex flex-wrap gap-6 mb-6 md:mb-10">
                 {product.colors && product.colors.map(color => (
                   <div 
                     key={color.colorId}
                     className="flex flex-col items-center cursor-pointer relative group w-12"
                     onClick={() => { setSelectedColor(color); setQuantity(1); }}
                   >
-                    <div className={`mt-2 text-sm transition-colors ${selectedColor?.colorId === color.colorId ? 'text-gray-900 font-bold' : 'text-gray-500 font-medium group-hover:text-gray-700'}`}>
+                    <div className={`mt-2 text-sm transition-colors ${selectedColor?.colorId === color.colorId ? 'text-[#1a1c1b] font-bold' : 'text-[#594138] font-medium group-hover:text-[#1a1c1b]'}`}>
                       {color.colorName}
                     </div>
                     <div className={`absolute -bottom-2 h-[2px] w-6 transition-colors ${selectedColor?.colorId === color.colorId ? 'bg-[#a63b00]' : 'bg-transparent'}`}></div>
@@ -301,14 +299,14 @@ const DetailPage: React.FC = () => {
 
               {/* Price */}
               <div className="mb-8 mt-10">
-                <p className="text-gray-500 mb-2 font-medium">Giá bán lẻ đề xuất</p>
+                <p className="text-[#594138] mb-2 font-medium">Giá bán lẻ đề xuất</p>
                 <div className="flex items-center gap-4">
                   <div className="flex flex-col">
                     <div className="flex items-baseline gap-2">
-                      <span className="font-black text-gray-900 text-4xl tracking-tighter">
+                      <span className="font-black text-[#1a1c1b] text-4xl tracking-tighter">
                         {finalPrice.toLocaleString('vi-VN')}
                       </span>
-                      <span className="text-gray-500 font-bold text-lg">VNĐ</span>
+                      <span className="text-[#594138] font-bold text-lg">VNĐ</span>
                     </div>
                     {priceAdj > 0 && (
                       <div className="mt-1">
@@ -319,10 +317,10 @@ const DetailPage: React.FC = () => {
                     )}
                   </div>
                   
-                  {product.activePromotion && (
+                  {product.appliedPromotion && (
                     <div className="flex flex-col ml-4">
                       <span className="text-[#a63b00] font-bold text-xs leading-none mb-1 px-2 py-1 bg-red-50 rounded-md self-start">
-                        {product.activePromotion.name}
+                        {product.appliedPromotion.promotionName}
                       </span>
                       <span className="text-gray-400 line-through text-sm leading-none mt-1">
                         {finalOriginalPrice.toLocaleString('vi-VN')} VNĐ
@@ -335,12 +333,12 @@ const DetailPage: React.FC = () => {
               {/* Add to cart */}
               <form onSubmit={handleAddToCart} className="mt-10 pt-8 border-t border-gray-200">
                 <div className="flex flex-wrap items-center gap-4">
-                  <div className={`inline-flex items-center border border-gray-300 rounded-lg bg-white shadow-sm h-12 ${isOutOfStock ? 'opacity-50' : ''}`}>
-                    <button type="button" disabled={isOutOfStock} className="px-4 h-full flex items-center justify-center text-gray-600 hover:bg-gray-50 disabled:cursor-not-allowed" onClick={() => adjustQty(-1)}>
+                  <div className={`inline-flex items-center border border-gray-300 rounded-xl bg-white shadow-sm h-12 ${isOutOfStock ? 'opacity-50' : ''}`}>
+                    <button type="button" disabled={isOutOfStock} className="px-4 h-full flex items-center justify-center text-[#594138] hover:bg-gray-50 disabled:cursor-not-allowed" onClick={() => adjustQty(-1)}>
                       <span className="material-symbols-outlined">remove</span>
                     </button>
-                    <input type="number" value={quantity} readOnly className="w-12 text-center font-bold text-gray-900 h-full border-x border-gray-300 focus:outline-none" />
-                    <button type="button" disabled={isOutOfStock} className="px-4 h-full flex items-center justify-center text-gray-600 hover:bg-gray-50 disabled:cursor-not-allowed" onClick={() => adjustQty(1)}>
+                    <input type="number" value={quantity} readOnly className="w-12 text-center font-bold text-[#1a1c1b] h-full border-x border-gray-300 focus:outline-none" />
+                    <button type="button" disabled={isOutOfStock} className="px-4 h-full flex items-center justify-center text-[#594138] hover:bg-gray-50 disabled:cursor-not-allowed" onClick={() => adjustQty(1)}>
                       <span className="material-symbols-outlined">add</span>
                     </button>
                   </div>
@@ -365,10 +363,10 @@ const DetailPage: React.FC = () => {
               </form>
             </div>
             
-            <div className="w-full lg:w-2/3 order-1 lg:order-1 mb-10 lg:mb-0 relative">
+            <div className="w-full lg:w-2/3 order-1 lg:order-1 mb-6 md:mb-10 lg:mb-0 relative">
                <div className="absolute inset-0 bg-gradient-to-tr from-gray-100 to-transparent rounded-full blur-3xl opacity-50 z-0"></div>
                <div className="w-full flex items-center justify-center h-[400px] lg:h-[600px]">
-                 <img src={activeImage || "https://via.placeholder.com/800"} alt={product.name} className="max-w-full max-h-full object-contain mix-blend-multiply transition-opacity duration-300" />
+                 <img fetchpriority="high" src={activeImage || "https://via.placeholder.com/800"} alt={product.name} className="max-w-full max-h-full object-contain mix-blend-multiply transition-opacity duration-300" />
                </div>
             </div>
           </div>
@@ -379,16 +377,16 @@ const DetailPage: React.FC = () => {
               <div className="flex flex-col lg:flex-row items-center gap-12">
                 <div className="w-full lg:w-1/3 lg:pl-12">
                   <h3 className="text-[#a63b00] italic font-black uppercase mb-6 text-2xl tracking-wider">THIẾT KẾ</h3>
-                  <h4 className="text-3xl font-bold text-gray-900 mb-6 leading-snug">
+                  <h4 className="text-3xl font-black tracking-tight text-[#1a1c1b] mb-6 leading-snug">
                     Thiết kế huyền thoại, đậm chất cổ điển
                   </h4>
-                  <p className="text-gray-500 leading-relaxed text-[0.95rem]">
+                  <p className="text-[#594138] leading-relaxed text-[0.95rem]">
                     {product.description || "Chưa có mô tả cho sản phẩm này."}
                   </p>
                 </div>
                 <div className="w-full lg:w-2/3">
                   <div className="relative overflow-hidden shadow-lg rounded-2xl h-[400px] lg:h-[600px] bg-gradient-to-b from-gray-50 to-gray-200">
-                    <img src={activeGalleryImage || "https://via.placeholder.com/800"} className="w-full h-full object-cover transition-all duration-500" alt="Gallery" />
+                    <img loading="lazy" decoding="async" src={activeGalleryImage || "https://via.placeholder.com/800"} className="w-full h-full object-cover transition-all duration-500" alt="Gallery" />
                     <div className="absolute bottom-0 left-0 w-full h-[150px] bg-gradient-to-t from-black/60 to-transparent"></div>
                     
                     <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-4 overflow-x-auto w-full justify-center px-8 snap-x">
@@ -398,7 +396,7 @@ const DetailPage: React.FC = () => {
                           className={`snap-center w-20 h-16 rounded-lg overflow-hidden cursor-pointer border-2 transition-all shrink-0 ${activeGalleryImage === img ? 'border-[#a63b00] opacity-100' : 'border-transparent opacity-70 hover:opacity-100'}`}
                           onClick={() => setActiveGalleryImage(img)}
                         >
-                          <img src={img} className="w-full h-full object-cover" alt="Thumbnail" />
+                          <img loading="lazy" decoding="async" src={img} className="w-full h-full object-cover" alt="Thumbnail" />
                         </div>
                       ))}
                     </div>
@@ -411,14 +409,14 @@ const DetailPage: React.FC = () => {
           {/* Specifications */}
           {product.specifications && product.specifications.length > 0 && (
             <section className="mt-20 pt-16 pb-20">
-              <h2 className="text-center font-light mb-16 text-gray-900 text-4xl">Thông số kỹ thuật</h2>
+              <h2 className="text-center font-light mb-16 text-[#1a1c1b] text-4xl">Thông số kỹ thuật</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-8 px-4 lg:px-8">
                 {product.specifications.map((spec, idx) => (
                   <div key={idx} className="flex justify-between items-center h-full border-b border-gray-100 pb-3">
-                    <span className="text-gray-900 font-medium text-sm max-w-[45%]">
+                    <span className="text-[#1a1c1b] font-medium text-sm max-w-[45%]">
                       {spec.specification?.specName || spec.specName || spec.name || 'Thông số'}
                     </span>
-                    <span className="text-gray-600 text-right text-sm max-w-[55%]">
+                    <span className="text-[#594138] text-right text-sm max-w-[55%]">
                       {spec.specValue || spec.value || ''}
                     </span>
                   </div>
@@ -429,20 +427,20 @@ const DetailPage: React.FC = () => {
 
           {/* Reviews Section */}
           <section className="mt-20 pt-20 border-t border-gray-200">
-            <div className="flex items-center justify-between mb-10">
-              <h2 className="text-3xl font-bold text-gray-900 m-0">Đánh giá từ khách hàng</h2>
-              <span className="bg-gray-100 text-gray-900 border border-gray-200 px-4 py-2 text-sm rounded-full font-medium">
+            <div className="flex items-center justify-between mb-6 md:mb-10">
+              <h2 className="text-3xl font-black tracking-tight text-[#1a1c1b] m-0">Đánh giá từ khách hàng</h2>
+              <span className="bg-gray-100 text-[#1a1c1b] border border-gray-200 px-4 py-2 text-sm rounded-full font-medium">
                 {comments.length} đánh giá
               </span>
             </div>
 
             {/* Review Form */}
             {isLogin && (
-              <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 mb-12">
-                <h4 className="text-xl font-bold mb-6 text-gray-900">Viết đánh giá của bạn</h4>
+              <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 mb-8 md:mb-12">
+                <h4 className="text-xl font-bold tracking-tight mb-6 text-[#1a1c1b]">Viết đánh giá của bạn</h4>
                 <form onSubmit={handleReviewSubmit}>
                   <div className="mb-6">
-                    <label className="block font-medium text-gray-600 mb-2">Chất lượng sản phẩm <span className="text-red-500">*</span></label>
+                    <label className="block font-medium text-[#594138] mb-2">Chất lượng sản phẩm <span className="text-red-500">*</span></label>
                     <div className="flex flex-row-reverse justify-end items-center group w-max">
                       {[5, 4, 3, 2, 1].map((star) => (
                         <React.Fragment key={star}>
@@ -455,7 +453,7 @@ const DetailPage: React.FC = () => {
                     </div>
                   </div>
                   <div className="mb-6">
-                    <label htmlFor="content" className="block font-medium text-gray-600 mb-2">Nội dung đánh giá <span className="text-red-500">*</span></label>
+                    <label htmlFor="content" className="block font-medium text-[#594138] mb-2">Nội dung đánh giá <span className="text-red-500">*</span></label>
                     <textarea 
                       id="content" 
                       rows={4} 
@@ -477,8 +475,8 @@ const DetailPage: React.FC = () => {
             {comments.length === 0 ? (
               <div className="text-center p-12 bg-gray-50 rounded-3xl border border-gray-200">
                 <span className="material-symbols-outlined text-5xl text-gray-300 mb-4">chat_bubble_outline</span>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Chưa có đánh giá nào</h3>
-                <p className="text-gray-500 m-0">Hãy là người đầu tiên trải nghiệm và đánh giá sản phẩm này.</p>
+                <h3 className="text-xl font-bold tracking-tight text-[#1a1c1b] mb-2">Chưa có đánh giá nào</h3>
+                <p className="text-[#594138] m-0">Hãy là người đầu tiên trải nghiệm và đánh giá sản phẩm này.</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -492,9 +490,9 @@ const DetailPage: React.FC = () => {
                        </div>
                     )}
                     <div className="flex items-center mb-4">
-                      <img src={comment.customer.avatarUrl || `https://ui-avatars.com/api/?name=${comment.customer.name}&background=random`} className="rounded-full object-cover shadow-sm border border-gray-200 w-12 h-12 mr-4" alt="Avatar" />
+                      <img loading="lazy" decoding="async" src={comment.customer.avatarUrl || `https://ui-avatars.com/api/?name=${comment.customer.name}&background=random`} className="rounded-full object-cover shadow-sm border border-gray-200 w-12 h-12 mr-4" alt="Avatar" />
                       <div>
-                        <h4 className="font-bold text-gray-900 mb-1 text-sm">{comment.customer.name}</h4>
+                        <h4 className="font-bold text-[#1a1c1b] mb-1 text-sm">{comment.customer.name}</h4>
                         <div className="flex items-center gap-2">
                           <div className="text-yellow-400 flex text-sm">
                             {[1, 2, 3, 4, 5].map(i => (
@@ -507,7 +505,7 @@ const DetailPage: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                    <p className="text-gray-600 flex-grow text-[0.95rem] leading-relaxed">
+                    <p className="text-[#594138] flex-grow text-[0.95rem] leading-relaxed">
                       {comment.content}
                     </p>
                   </div>

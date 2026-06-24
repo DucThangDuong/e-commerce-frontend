@@ -138,18 +138,18 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen pt-[56px] flex flex-col overflow-hidden bg-gray-50 text-gray-900 font-['Plus_Jakarta_Sans',sans-serif]">
+    <div className="min-h-screen pt-[56px] flex flex-col overflow-hidden bg-gray-50 text-[#1a1c1b] font-sans">
       <div className="flex flex-grow overflow-hidden relative">
         <main className="flex-grow h-full overflow-y-auto p-4 scroll-smooth">
-          <div className="container mx-auto flex items-center justify-center h-full py-12">
+          <div className="container mx-auto flex items-center justify-center h-full py-8 md:py-12">
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 w-full overflow-hidden max-w-[480px]">
               <div className="p-6 md:p-10 flex flex-col gap-6">
                 
                 <div className="text-center">
-                  <h1 className="text-2xl font-bold text-gray-900 mb-2 tracking-tight">
+                  <h1 className="text-2xl font-bold tracking-tight text-[#1a1c1b] mb-2 tracking-tight">
                     Chào mừng trở lại
                   </h1>
-                  <p className="text-gray-500 mb-0">
+                  <p className="text-[#594138] mb-0">
                     Vui lòng nhập thông tin đăng nhập của bạn.
                   </p>
                 </div>
@@ -195,7 +195,7 @@ const LoginPage: React.FC = () => {
                   )}
 
                   <div>
-                    <label className="block font-bold text-sm mb-1 text-gray-700">Email</label>
+                    <label className="block font-bold text-sm mb-2 text-[#1a1c1b] tracking-wide">Email</label>
                     <div className="relative flex items-center">
                       <span className="absolute left-3 text-gray-400 flex items-center">
                         <span className="material-symbols-outlined text-xl">mail</span>
@@ -204,7 +204,7 @@ const LoginPage: React.FC = () => {
                         type="email" 
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#a63b00] focus:border-transparent transition-all" 
+                        className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#a63b00] focus:border-transparent transition-all" 
                         placeholder="name@example.com" 
                         required 
                       />
@@ -212,7 +212,7 @@ const LoginPage: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block font-bold text-sm mb-1 text-gray-700">Mật khẩu</label>
+                    <label className="block font-bold text-sm mb-2 text-[#1a1c1b] tracking-wide">Mật khẩu</label>
                     <div className="relative flex items-center">
                       <span className="absolute left-3 text-gray-400 flex items-center">
                         <span className="material-symbols-outlined text-xl">lock</span>
@@ -221,7 +221,7 @@ const LoginPage: React.FC = () => {
                         type="password" 
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#a63b00] focus:border-transparent transition-all" 
+                        className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#a63b00] focus:border-transparent transition-all" 
                         placeholder="••••••••" 
                         required 
                       />
@@ -237,7 +237,7 @@ const LoginPage: React.FC = () => {
                         onChange={(e) => setRememberMe(e.target.checked)}
                         className="w-4 h-4 text-[#a63b00] rounded border-gray-300 focus:ring-[#a63b00] cursor-pointer" 
                       />
-                      <label htmlFor="rememberMe" className="ml-2 text-sm text-gray-700 cursor-pointer">
+                      <label htmlFor="rememberMe" className="ml-2 text-sm text-[#1a1c1b] cursor-pointer">
                         Nhớ tôi
                       </label>
                     </div>
@@ -249,20 +249,19 @@ const LoginPage: React.FC = () => {
                   <button 
                     type="submit" 
                     disabled={isLoading}
-                    className="w-full bg-[#a63b00] hover:bg-[#8a3100] text-white font-bold py-3 mt-2 rounded-lg shadow-sm transition-colors h-12 disabled:opacity-70 flex justify-center items-center"
+                    className="w-full bg-[#a63b00] hover:bg-[#8a3100] text-white font-bold py-3 mt-2 rounded-xl shadow-sm transition-colors h-12 disabled:opacity-70 flex justify-center items-center"
                   >
                     {isLoading ? (
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-white/30 border-t-white"></div>
                     ) : (
                       "Đăng nhập"
                     )}
                   </button>
                 </form>
-
               </div>
 
-              <div className="p-4 bg-gray-50 border-t border-gray-200 text-center">
-                <p className="text-gray-500 text-sm mb-0">
+              <div className=" pt-4 py-5 border-t border-gray-100 text-center">
+                <p className="text-[#594138] text-[0.875rem] mb-0">
                   Chưa có tài khoản?{' '}
                   <Link to="/register" className="text-[#a63b00] hover:text-[#8a3100] font-bold no-underline">
                     Đăng ký ngay

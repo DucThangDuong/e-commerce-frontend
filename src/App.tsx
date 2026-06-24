@@ -62,13 +62,17 @@ function App() {
           setUser(userData);
           setIsLogin(true);
         } else {
-          const data: { accessToken: string } =
-            await apiClient.post("/refresh-token");
-          setCookie("accessToken", data.accessToken);
-          const response: any = await apiClient.get("/customer/profile");
-          const userData = response?.data ? response.data : response;
-          setUser(userData);
-          setIsLogin(true);
+          const refreshRes: any = await apiClient.post("/refresh-token");
+          
+          if (refreshRes?.success && refreshRes?.accessToken) {
+            setCookie("accessToken", refreshRes.accessToken);
+            const response: any = await apiClient.get("/customer/profile");
+            const userData = response?.data ? response.data : response;
+            setUser(userData);
+            setIsLogin(true);
+          } else {
+            throw new Error("Refresh token expired or invalid");
+          }
         }
       } catch {
         setUser(null);

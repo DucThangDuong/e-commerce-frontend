@@ -70,9 +70,7 @@ const CheckoutPage: React.FC = () => {
 
   // Summary states
   const subtotal = validatedOrder ? validatedOrder.subTotal : checkoutItems.reduce((acc, item) => {
-    const base = item.discountedPrice || item.basePrice;
-    const priceAdj = item.priceAdjustment || 0;
-    return acc + (base + priceAdj) * item.quantity;
+    return acc + item.discountedPrice * item.quantity;
   }, 0);
   const shippingFee = subtotal > 0 ? 30000 : 0;
   
@@ -173,8 +171,6 @@ const CheckoutPage: React.FC = () => {
     } catch (err: any) {
       const errorMsg = err.message || 'Mã giảm giá không hợp lệ hoặc đã hết hạn';
       setCouponError(errorMsg);
-      // Optional: hide toast if we have inline error
-      // showNotification(errorMsg, 'danger');
       setAppliedCouponInfo(null);
     } finally {
       setCouponLoading(false);
@@ -302,7 +298,7 @@ const CheckoutPage: React.FC = () => {
                   
                   // Use validated price if available
                   const validatedItem = validatedOrder?.items.find(v => v.colorId === item.colorId);
-                  const price = validatedItem ? validatedItem.unitPrice : ((item.discountedPrice || item.basePrice) + (item.priceAdjustment || 0));
+                  const price = validatedItem ? validatedItem.unitPrice : item.discountedPrice;
                   const lineTotal = validatedItem ? validatedItem.lineTotal : (price * item.quantity);
 
                   return (

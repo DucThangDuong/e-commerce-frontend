@@ -129,7 +129,7 @@ const DetailPage: React.FC = () => {
   const handleAddToCart = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isLogin) {
-      showNotification('Vui lòng đăng nhập để thêm vào giỏ hàng!', 'warning');
+      navigate('/login');
       return;
     }
     
@@ -179,7 +179,7 @@ const DetailPage: React.FC = () => {
   const handleBuyNow = async (e: React.MouseEvent) => {
     e.preventDefault();
     if (!isLogin) {
-      showNotification('Vui lòng đăng nhập để mua hàng!', 'warning');
+      navigate('/login');
       return;
     }
     
@@ -366,7 +366,7 @@ const DetailPage: React.FC = () => {
             <div className="w-full lg:w-2/3 order-1 lg:order-1 mb-6 md:mb-10 lg:mb-0 relative">
                <div className="absolute inset-0 bg-gradient-to-tr from-gray-100 to-transparent rounded-full blur-3xl opacity-50 z-0"></div>
                <div className="w-full flex items-center justify-center h-[400px] lg:h-[600px]">
-                 <img fetchpriority="high" src={activeImage || "https://via.placeholder.com/800"} alt={product.name} className="max-w-full max-h-full object-contain mix-blend-multiply transition-opacity duration-300" />
+                 <img src={activeImage || "https://via.placeholder.com/800"} alt={product.name} className="max-w-full max-h-full object-contain mix-blend-multiply transition-opacity duration-300" />
                </div>
             </div>
           </div>

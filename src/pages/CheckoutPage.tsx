@@ -5,6 +5,27 @@ import { useStore } from '../zustand/store';
 import type { ResCartDto } from '../interfaces/cart';
 import type { ValidateCartResponse, ActiveCouponResponse, ApplyCouponResponse } from '../interfaces/order';
 
+import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+
+// Fix leaflet default icon
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
+
+const MapClickHandler = ({ onLocationSelect }: { onLocationSelect: (latlng: L.LatLng) => void }) => {
+  useMapEvents({
+    click(e) {
+      onLocationSelect(e.latlng);
+    },
+  });
+  return null;
+};
+
 interface ApiResponse<T> {
   success: boolean;
   message: string;
@@ -15,7 +36,7 @@ const CheckoutPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const cartIdsParam = searchParams.get('cartIds');
   const navigate = useNavigate();
-  const { isLogin, showNotification } = useStore();
+  const { isLogin, user, showNotification } = useStore();
 
   const [checkoutItems, setCheckoutItems] = useState<ResCartDto[]>([]);
   const [validatedOrder, setValidatedOrder] = useState<ValidateCartResponse | null>(null);
@@ -25,6 +46,35 @@ const CheckoutPage: React.FC = () => {
   const [coupons, setCoupons] = useState<ActiveCouponResponse[]>([]);
   const [selectedCoupon, setSelectedCoupon] = useState('');
   const [appliedCouponInfo, setAppliedCouponInfo] = useState<ApplyCouponResponse | null>(null);
+
+  // Map Picker State
+  // Map Picker State
+  const [mapPosition, setMapPosition] = useState<[number, number] | null>(null);
+  const [tempPosition, setTempPosition] = useState<L.LatLng | null>(null);
+  const [showMapModal, setShowMapModal] = useState(false);
+  const [isGeocoding, setIsGeocoding] = useState(false);
+
+  const confirmMapLocation = async () => {
+    if (!tempPosition) return;
+    setIsGeocoding(true);
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${tempPosition.lat}&lon=${tempPosition.lng}&accept-language=vi`);
+      const data = await res.json();
+      if (data && data.display_name) {
+        setAddress(data.display_name);
+        setMapPosition([tempPosition.lat, tempPosition.lng]);
+        setShowMapModal(false);
+        if (touched.address) validateField('address', data.display_name);
+      } else {
+        showNotification('Không tìm thấy địa chỉ cho vị trí này', 'warning');
+      }
+    } catch (err) {
+      console.error(err);
+      showNotification('Lỗi khi lấy địa chỉ', 'danger');
+    } finally {
+      setIsGeocoding(false);
+    }
+  };
   const [couponLoading, setCouponLoading] = useState(false);
   const [couponError, setCouponError] = useState('');
 
@@ -35,9 +85,16 @@ const CheckoutPage: React.FC = () => {
   const successTimeout2 = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Form states
-  const [address, setAddress] = useState('');
-  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState(user?.address || '');
+  const [phone, setPhone] = useState(user?.phoneNumber || '');
   const [paymentMethod, setPaymentMethod] = useState('cod');
+
+  useEffect(() => {
+    if (user) {
+      if (user.address && !address) setAddress(user.address);
+      if (user.phoneNumber && !phone) setPhone(user.phoneNumber);
+    }
+  }, [user]);
 
   // Validation states
   const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string }>({});
@@ -277,7 +334,7 @@ const CheckoutPage: React.FC = () => {
     <div className="pt-[56px] bg-gray-50 font-sans text-[#1a1c1b] min-h-screen flex flex-col overflow-x-hidden">
       <main className="flex-grow container mx-auto py-8 md:py-12 px-4 max-w-7xl">
         <div className="mb-6 md:mb-10">
-          <h1 className="text-2xl md:text-3xl font-black text-[#1a1c1b] mb-2 tracking-tight">Thanh toán</h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-[#1a1c1b] mb-2 tracking-tight">Thanh toán</h1>
           <p className="text-[#594138] text-sm">Vui lòng kiểm tra lại thông tin và xác nhận đơn hàng của bạn.</p>
         </div>
 
@@ -310,7 +367,7 @@ const CheckoutPage: React.FC = () => {
                         <h4 className="font-bold text-[#1a1c1b] text-sm mb-1 truncate">{item.name} - {item.colorName}</h4>
                         <p className="text-[#594138] text-xs">Số lượng: {item.quantity}</p>
                       </div>
-                      <div className="font-black text-[#a63b00] text-sm flex-shrink-0">
+                      <div className="font-bold text-[#a63b00] text-sm flex-shrink-0">
                         {lineTotal.toLocaleString('vi-VN')} VNĐ
                       </div>
                     </div>
@@ -327,18 +384,41 @@ const CheckoutPage: React.FC = () => {
               </div>
               <div className="flex flex-col gap-5">
                 <div>
-                  <label className="block text-[#594138] font-bold uppercase text-[0.65rem] tracking-wider mb-2">Địa chỉ</label>
-                  <input 
-                    type="text" 
-                    value={address}
-                    onChange={(e) => {
-                      setAddress(e.target.value);
-                      if (touched.address) validateField('address', e.target.value);
-                    }}
-                    onBlur={() => handleBlur('address', address)}
-                    className={`w-full px-4 py-3 rounded-xl border ${fieldErrors.address && touched.address ? 'border-red-500 focus:ring-red-500 focus:border-red-500 bg-red-50' : 'border-gray-300 focus:ring-[#a63b00] focus:border-[#a63b00]'} focus:ring-2 outline-none transition-all`}
-                    placeholder="123 Đường Lê Lợi, Quận 1, TP. HCM"
-                  />
+                  <div className="flex justify-between items-center mb-2">
+                    <label className="block text-[#594138] font-bold uppercase text-[0.65rem] tracking-wider">Địa chỉ</label>
+                    <button type="button" onClick={() => { setTempPosition(mapPosition ? new L.LatLng(mapPosition[0], mapPosition[1]) : null); setShowMapModal(true); }} className="text-[#a63b00] text-xs font-bold hover:underline flex items-center gap-1">
+                      <span className="material-symbols-outlined text-[14px]">map</span>
+                      Mở bản đồ
+                    </button>
+                  </div>
+                  
+                  <div className="flex flex-col gap-3">
+                    <input 
+                      type="text" 
+                      value={address}
+                      onChange={(e) => {
+                        setAddress(e.target.value);
+                        if (touched.address) validateField('address', e.target.value);
+                      }}
+                      onBlur={() => handleBlur('address', address)}
+                      className={`w-full px-4 py-3 rounded-xl border ${fieldErrors.address && touched.address ? 'border-red-500 focus:ring-red-500 focus:border-red-500 bg-red-50' : 'border-gray-300 focus:ring-[#a63b00] focus:border-[#a63b00]'} focus:ring-2 outline-none transition-all`}
+                      placeholder="123 Đường Lê Lợi, Quận 1, TP. HCM"
+                    />
+                    
+                    {mapPosition && (
+                      <div className="w-full h-40 rounded-xl overflow-hidden border border-gray-200 relative shadow-sm pointer-events-none">
+                        <MapContainer center={mapPosition} zoom={15} style={{ height: '100%', width: '100%' }} dragging={false} zoomControl={false} scrollWheelZoom={false} doubleClickZoom={false}>
+                          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                          <Marker position={mapPosition} />
+                        </MapContainer>
+                        <div className="absolute top-2 right-2 z-[400] pointer-events-auto">
+                          <button type="button" onClick={(e) => { e.preventDefault(); setMapPosition(null); }} className="w-8 h-8 bg-white/80 backdrop-blur rounded-full flex items-center justify-center text-gray-500 hover:text-red-500 hover:bg-white shadow-sm">
+                            <span className="material-symbols-outlined text-sm">close</span>
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                   {fieldErrors.address && touched.address && (
                     <p className="text-red-500 text-xs mt-1 font-medium flex items-center gap-1 animate-fade-in-down">
                       <span className="material-symbols-outlined text-[14px]">error</span>
@@ -534,7 +614,7 @@ const CheckoutPage: React.FC = () => {
 
                 <div className="flex justify-between items-center">
                   <span className="text-[#1a1c1b] font-bold text-base">Tổng cộng</span>
-                  <span className="text-[#a63b00] font-black text-2xl">{grandTotal.toLocaleString('vi-VN')} VNĐ</span>
+                  <span className="text-[#a63b00] font-bold text-2xl">{grandTotal.toLocaleString('vi-VN')} VNĐ</span>
                 </div>
               </div>
 
@@ -547,6 +627,60 @@ const CheckoutPage: React.FC = () => {
 
         </form>
       </main>
+
+      {/* Map Picker Modal */}
+      {showMapModal && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-3xl shadow-xl w-full max-w-4xl overflow-hidden animate-scale-up flex flex-col h-[85vh]">
+            <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-white shrink-0">
+              <h3 className="font-bold text-lg text-[#1a1c1b] flex items-center gap-2">
+                <span className="material-symbols-outlined text-[#a63b00]">pin_drop</span>
+                Ghim vị trí giao hàng
+              </h3>
+              <button type="button" onClick={() => setShowMapModal(false)} className="text-gray-400 hover:text-[#594138] transition-colors w-8 h-8 flex items-center justify-center bg-gray-50 rounded-full">
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+            
+            <div className="flex-grow relative bg-gray-100 z-0">
+              <MapContainer 
+                center={tempPosition || [10.8231, 106.6297]} // Default to Ho Chi Minh City
+                zoom={13} 
+                style={{ height: '100%', width: '100%' }}
+              >
+                <TileLayer
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                <MapClickHandler onLocationSelect={setTempPosition} />
+                {tempPosition && <Marker position={tempPosition} />}
+              </MapContainer>
+              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[400] bg-white px-4 py-2 rounded-full shadow-lg border border-gray-200 text-sm font-bold text-[#1a1c1b] pointer-events-none">
+                Chạm vào bản đồ để chọn vị trí
+              </div>
+            </div>
+            
+            <div className="p-4 border-t border-gray-100 bg-white flex justify-end gap-3 shrink-0">
+               <button 
+                 type="button"
+                 onClick={() => setShowMapModal(false)}
+                 className="px-5 py-2.5 bg-gray-50 border border-gray-200 text-[#1a1c1b] rounded-xl font-bold hover:bg-gray-100 transition-colors text-sm"
+               >
+                 Đóng
+               </button>
+               <button 
+                 type="button"
+                 disabled={!tempPosition || isGeocoding}
+                 onClick={confirmMapLocation}
+                 className="px-6 py-2.5 bg-[#a63b00] text-white rounded-xl font-bold hover:bg-orange-800 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+               >
+                 {isGeocoding ? <span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin"></span> : null}
+                 Xác nhận & Tự động điền
+               </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Center Success Toast */}
       {showSuccess && (

@@ -116,7 +116,13 @@ export const apiClient = {
       headers: {
         "Content-Type": "multipart/form-data",
       },
-    }),
+    }).then(res => res.data),
+  putForm: <T>(url: string, data: FormData) =>
+    axiosInstance.put<T>(url, data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }).then(res => res.data),
   getFile: (url: string) =>
     axiosInstance.get(url, { responseType: "blob" }).then((res) => res.data),
   postnodata: <T>(url: string, data: object = {}) =>

@@ -16,8 +16,65 @@ export interface ResSimpleFeaturedProductDto {
   firstColorImageUrl?: string;
 }
 
+export interface ResPromotionProductItemDto {
+  productId: number;
+  name: string;
+  description?: string;
+  imageUrl?: string;
+  basePrice: number;
+  discountedPrice: number;
+  totalSlots: number;
+  remainingSlots: number;
+}
+
+export interface ResPromotionWithProductsDto {
+  promotionId: number;
+  name: string;
+  startDate: string;
+  endDate: string;
+  discountType: string;
+  discountValue: number;
+  products: ResPromotionProductItemDto[];
+}
+
+const Countdown = ({ endDate }: { endDate: string }) => {
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+
+  useEffect(() => {
+    const target = new Date(endDate).getTime();
+    const interval = setInterval(() => {
+      const now = new Date().getTime();
+      const diff = target - now;
+      if (diff <= 0) {
+        clearInterval(interval);
+        return;
+      }
+      setTimeLeft({
+        days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+        minutes: Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
+        seconds: Math.floor((diff % (1000 * 60)) / 1000),
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [endDate]);
+
+  return (
+    <div className="flex items-center gap-2 text-white font-bold text-sm md:text-base">
+      <span className="hidden md:inline">Kết thúc sau:</span>
+      <div className="flex gap-1 items-center">
+        <span className="bg-white/20 px-2 py-1 rounded">{timeLeft.days}</span> ngày
+        <span className="bg-white/20 px-2 py-1 rounded">{timeLeft.hours}</span> giờ
+        <span className="bg-white/20 px-2 py-1 rounded">{timeLeft.minutes}</span> phút
+        <span className="bg-white/20 px-2 py-1 rounded">{timeLeft.seconds}</span> giây
+      </div>
+    </div>
+  );
+};
+
 const HomePage: React.FC = () => {
   const [featuredProducts, setFeaturedProducts] = useState<ResSimpleFeaturedProductDto[]>([]);
+  const [promotions, setPromotions] = useState<ResPromotionWithProductsDto[]>([]);
   const [categories, setCategories] = useState<ResCategoryDto[]>([]);
   const [brands, setBrands] = useState<ResBrandDto[]>([]);
   const [loading, setLoading] = useState(true);
@@ -28,10 +85,11 @@ const HomePage: React.FC = () => {
       try {
         setLoading(true);
         
-        const [categoriesRes, brandsRes, featuredRes] = await Promise.allSettled([
+        const [categoriesRes, brandsRes, featuredRes, promotionRes] = await Promise.allSettled([
           apiClient.get<ApiResponse<ResCategoryDto[]>>('/category'),
           apiClient.get<ApiResponse<ResBrandDto[]>>('/brand'),
-          apiClient.get<ApiResponse<ResSimpleFeaturedProductDto[]>>('/product/featured').catch(() => null)
+          apiClient.get<ApiResponse<ResSimpleFeaturedProductDto[]>>('/product/featured').catch(() => null),
+          apiClient.get<ApiResponse<ResPromotionWithProductsDto[]>>('/promotion/active').catch(() => null)
         ]);
 
         if (categoriesRes.status === 'fulfilled' && categoriesRes.value?.data) setCategories(categoriesRes.value.data);
@@ -39,6 +97,9 @@ const HomePage: React.FC = () => {
         if (featuredRes.status === 'fulfilled' && featuredRes.value?.data) {
            const sorted = featuredRes.value.data.sort((a, b) => (a.displayOrder || 99) - (b.displayOrder || 99));
            setFeaturedProducts(sorted);
+        }
+        if (promotionRes.status === 'fulfilled' && promotionRes.value?.data) {
+           setPromotions(promotionRes.value.data);
         }
         
       } catch (error) {
@@ -190,21 +251,71 @@ const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* Top Products */}
-      <section className="py-12 md:py-20 bg-[#f9f9f7]">
-        <div className="container mx-auto px-4 max-w-7xl">
-          <div className="mb-8 md:mb-12 max-w-2xl">
-            <h2 className="text-2xl md:text-3xl font-black text-[#1a1c1b] tracking-tight mb-4">Sản Phẩm Nổi Bật</h2>
-            <p className="text-[#594138] text-lg">Tinh hoa công nghệ hội tụ trong từng đường nét. Trải nghiệm sự khác biệt từ ánh nhìn đầu tiên.</p>
-          </div>
+      {/* Promotions / Flash Sale Section replacing Top Products */}
+      {promotions.map(promo => (
+        <section key={promo.promotionId} className="w-full bg-gradient-to-r from-[#8a3100] to-[#a63b00] py-12 md:py-20 relative overflow-hidden">
+          {/* Background pattern */}
+          <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle, #fff 2px, transparent 2px)', backgroundSize: '20px 20px' }}></div>
+          
+          <div className="container mx-auto px-4 max-w-7xl relative z-10">
+            <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+              <div className="flex items-center gap-4">
+                <span className="material-symbols-outlined text-yellow-300 text-5xl animate-pulse">bolt</span>
+                <h2 className="text-3xl md:text-4xl font-black text-yellow-300 italic tracking-wider uppercase">
+                  {promo.name}
+                </h2>
+              </div>
+              <Countdown endDate={promo.endDate} />
+            </div>
 
-          <div className="mt-12">
-            <Link to="/categories" className="inline-block border-2 border-[#1a1c1b] text-[#1a1c1b] rounded-xl px-8 py-3 font-bold transition-colors duration-300 hover:bg-[#1a1c1b] hover:text-white">
-              Xem Tất Cả Sản Phẩm
-            </Link>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+              {promo.products.map(item => {
+                const usedSlots = item.totalSlots - item.remainingSlots;
+                const progressPercent = item.totalSlots > 0 ? Math.min(100, Math.round((usedSlots / item.totalSlots) * 100)) : 0;
+                const displayImage = item.imageUrl || "https://via.placeholder.com/300";
+
+                return (
+                  <Link key={item.productId} to={`/product/${item.productId}`} className="bg-white rounded-xl shadow-md p-3 flex flex-col hover:-translate-y-1 transition-transform group relative">
+                    <div className="absolute top-2 left-2 z-10 bg-red-600 text-white px-2 py-0.5 rounded text-[10px] font-bold">
+                      {promo.name}
+                    </div>
+                    <div className="h-40 w-full mb-3 flex items-center justify-center p-2 bg-gray-50 rounded-lg">
+                      <img src={displayImage} alt={item.name} className="max-h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform" />
+                    </div>
+                    <div className="flex flex-col flex-grow">
+                      <h3 className="font-bold text-sm text-[#1a1c1b] line-clamp-2 mb-2 leading-tight flex-grow">{item.name}</h3>
+                      <div className="mb-2">
+                        <span className="text-[#a63b00] font-black text-lg block leading-none">{item.discountedPrice.toLocaleString('vi-VN')}₫</span>
+                        <span className="text-gray-400 line-through text-xs">{item.basePrice.toLocaleString('vi-VN')}₫</span>
+                      </div>
+                      
+                      {/* Progress Bar */}
+                      <div className="mt-auto pt-2">
+                        <div className="relative w-full h-5 bg-red-200 rounded-full overflow-hidden flex items-center justify-center">
+                          <div 
+                            className="absolute top-0 left-0 h-full bg-gradient-to-r from-red-500 to-red-600 rounded-full"
+                            style={{ width: `${progressPercent}%` }}
+                          ></div>
+                          <div className="absolute inset-0 flex items-center justify-center gap-1 z-10 text-white text-[10px] font-bold drop-shadow-md uppercase">
+                            <span className="material-symbols-outlined text-[12px] text-yellow-300">local_fire_department</span>
+                            Còn {item.remainingSlots}/{item.totalSlots} suất
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+            
+            <div className="mt-8 text-center">
+              <Link to="/categories" className="inline-block bg-white/20 hover:bg-white/30 text-white px-6 py-2 rounded-full font-bold text-sm transition-colors border border-white/50">
+                Xem tất cả
+              </Link>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      ))}
     </main>
   );
 };

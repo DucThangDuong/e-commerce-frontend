@@ -18,7 +18,8 @@ const FilterPage: React.FC = () => {
   const q = searchParams.get('q') || '';
   const selectedCategoryIds = searchParams.getAll('categoryIds').flatMap(id => id.split(','));
   const selectedBrandIds = searchParams.getAll('brandIds').flatMap(id => id.split(','));
-  const sort = searchParams.get('sort') || 'price_asc';
+  const minPriceParam = searchParams.get('minPrice') ? parseInt(searchParams.get('minPrice')!, 10) : null;
+  const maxPriceParam = searchParams.get('maxPrice') ? parseInt(searchParams.get('maxPrice')!, 10) : null;
   const pageParam = parseInt(searchParams.get('page') || '1', 10);
   const pageSizeParam = parseInt(searchParams.get('pageSize') || '12', 10);
 
@@ -26,6 +27,11 @@ const FilterPage: React.FC = () => {
   const [categories, setCategories] = useState<ResCategoryDto[]>([]);
   const [brands, setBrands] = useState<ResBrandDto[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [localQuery, setLocalQuery] = useState(q);
+  const [minPrice, setMinPrice] = useState<number | ''>(minPriceParam ?? '');
+  const [maxPrice, setMaxPrice] = useState<number | ''>(maxPriceParam ?? '');
+  
   const [pagination, setPagination] = useState({
     totalItems: 0,
     totalPages: 1,
@@ -34,18 +40,43 @@ const FilterPage: React.FC = () => {
   });
 
   useEffect(() => {
+    setLocalQuery(q);
+  }, [q]);
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const newParams = new URLSearchParams(searchParams);
+    if (localQuery.trim()) {
+      newParams.set('q', localQuery.trim());
+    } else {
+      newParams.delete('q');
+    }
+    newParams.set('page', '1');
+    setSearchParams(newParams);
+  };
+
+  useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         const skip = (pageParam - 1) * pageSizeParam;
         const take = pageSizeParam;
         let apiUrl = `/product/filter?skip=${skip}&take=${take}`;
+        if (q) {
+          apiUrl += `&Keyword=${encodeURIComponent(q)}`;
+        }
         selectedCategoryIds.forEach(id => {
           apiUrl += `&CategoryIds=${id}`;
         });
         selectedBrandIds.forEach(id => {
           apiUrl += `&BrandIds=${id}`;
         });
+        if (minPriceParam !== null) {
+          apiUrl += `&MinPrice=${minPriceParam}`;
+        }
+        if (maxPriceParam !== null) {
+          apiUrl += `&MaxPrice=${maxPriceParam}`;
+        }
 
         const [categoriesRes, brandsRes, productsRes] = await Promise.allSettled([
           apiClient.get<ApiResponse<ResCategoryDto[]>>('/category'),
@@ -65,26 +96,7 @@ const FilterPage: React.FC = () => {
             pageSize: pagedData.pageSize
           });
 
-          // Client-side filtering (applied to the current fetched page)
           let filtered = pagedData.products;
-          
-          if (q) {
-            filtered = filtered.filter(p => p.name.toLowerCase().includes(q.toLowerCase()) || p.description?.toLowerCase().includes(q.toLowerCase()));
-          }
-          
-          if (selectedCategoryIds.length > 0) {
-            filtered = filtered.filter(p => selectedCategoryIds.includes(p.categoryId.toString()));
-          }
-          
-          if (selectedBrandIds.length > 0) {
-            filtered = filtered.filter(p => p.brandId != null && selectedBrandIds.includes(p.brandId.toString()));
-          }
-          
-          if (sort === 'price_asc') {
-            filtered.sort((a, b) => a.discountedPrice - b.discountedPrice);
-          } else if (sort === 'price_desc') {
-            filtered.sort((a, b) => b.discountedPrice - a.discountedPrice);
-          }
 
           setProducts(filtered);
         }
@@ -126,11 +138,65 @@ const FilterPage: React.FC = () => {
     setSearchParams(newParams);
   };
 
-  const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const MIN_PRICE_LIMIT = 0;
+  const MAX_PRICE_LIMIT = 2000000000;
+
+  const handleMinPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value.replace(/\D/g, '');
+    if (rawValue === '') {
+      setMinPrice('');
+      return;
+    }
+    setMinPrice(Number(rawValue));
+  };
+
+  const handleMaxPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value.replace(/\D/g, '');
+    if (rawValue === '') {
+      setMaxPrice('');
+      return;
+    }
+    setMaxPrice(Number(rawValue));
+  };
+
+  const formatPrice = (val: number | '') => {
+    if (val === '') return '';
+    return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  };
+
+  const validateAndApplyPrice = () => {
+    let finalMin = minPrice === '' ? MIN_PRICE_LIMIT : minPrice;
+    let finalMax = maxPrice === '' ? MAX_PRICE_LIMIT : maxPrice;
+
+    if (finalMin > MAX_PRICE_LIMIT) finalMin = MAX_PRICE_LIMIT;
+    if (finalMax > MAX_PRICE_LIMIT) finalMax = MAX_PRICE_LIMIT;
+
+    if (finalMin > finalMax) {
+      const temp = finalMin;
+      finalMin = finalMax;
+      finalMax = temp;
+    }
+
+    setMinPrice(finalMin);
+    setMaxPrice(finalMax);
+
     const newParams = new URLSearchParams(searchParams);
-    newParams.set('sort', e.target.value);
+    
+    if (finalMin > MIN_PRICE_LIMIT) {
+      newParams.set('minPrice', finalMin.toString());
+    } else {
+      newParams.delete('minPrice');
+    }
+
+    if (finalMax < MAX_PRICE_LIMIT) {
+      newParams.set('maxPrice', finalMax.toString());
+    } else {
+      newParams.delete('maxPrice');
+    }
+    
     newParams.set('page', '1');
     setSearchParams(newParams);
+    setIsFilterOpen(false);
   };
 
   const resetFilters = () => {
@@ -155,85 +221,187 @@ const FilterPage: React.FC = () => {
     <div className="bg-[#f9f9f7] text-[#1a1c1b] font-sans min-h-screen flex flex-col overflow-x-hidden pt-[56px]">
       <div className="flex-grow relative">
         <main className="container mx-auto px-4 py-8 md:py-12 max-w-7xl">
-          <div className="flex flex-col lg:flex-row gap-8 items-start">
+          
+          <div className="flex flex-col gap-6 w-full">
             
-            {/* Sidebar */}
-            <aside className="w-full lg:w-1/4 lg:sticky lg:top-24">
-              <div className="flex flex-col gap-8 bg-white p-6 border border-gray-200 rounded-2xl shadow-sm">
+            {/* Header: Search, Filter Toggle, Result Count */}
+            <header className="flex flex-col md:flex-row items-center justify-between mb-2 pb-4 border-b border-gray-200 gap-4">
+              <div className="flex items-center gap-4 w-full md:w-auto">
+                <form onSubmit={handleSearchSubmit} className="relative w-full md:w-[350px]">
+                  <input 
+                    type="text" 
+                    placeholder="Nhập tên loại xe" 
+                    value={localQuery}
+                    onChange={(e) => setLocalQuery(e.target.value)}
+                    className="w-full border border-gray-300 bg-white py-3 px-5 pr-12 focus:outline-none focus:border-[#a63b00] text-gray-700"
+                  />
+                  <button type="submit" className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#a63b00]">
+                    <span className="material-symbols-outlined text-[24px]">search</span>
+                  </button>
+                </form>
+                
+                <button 
+                  onClick={() => setIsFilterOpen(true)}
+                  className="w-[48px] h-[48px] shrink-0 rounded-full border-[1.5px] border-[#e02b27] flex items-center justify-center text-[#e02b27] hover:bg-[#e02b27] hover:text-white transition-colors"
+                >
+                  <span className="material-symbols-outlined text-[24px]">filter_alt</span>
+                </button>
 
-                <div>
-                  <h3 className="uppercase text-xl font-bold tracking-tight m-0">Bộ lọc</h3>
+                <div className="hidden md:flex flex-col pl-4 border-l border-gray-200">
+                  <span className="text-gray-500 text-sm">Kết quả:</span>
+                  <span className="font-bold text-lg leading-tight">{pagination.totalItems} sản phẩm</span>
                 </div>
+              </div>
+            </header>
 
-                <div>
-                  <h4 className="text-[#594138] uppercase font-bold mb-4 text-xs tracking-widest">
-                    Loại xe
-                  </h4>
-                  <div className="flex flex-col gap-3">
-                    {categories.map(cat => (
-                      <label key={cat.categoryId} className="flex justify-between items-center text-[#594138] cursor-pointer hover:text-[#1a1c1b] transition-colors">
-                        <span className="text-sm font-bold uppercase">{cat.name}</span>
-                        <input 
-                          type="checkbox" 
-                          checked={selectedCategoryIds.includes(cat.categoryId.toString())}
-                          onChange={() => handleCategoryChange(cat.categoryId.toString())}
-                          className="w-4 h-4 text-[#a63b00] rounded border-gray-300 focus:ring-[#a63b00] cursor-pointer" 
-                        />
-                      </label>
-                    ))}
-                  </div>
-                </div>
+            <div className="md:hidden mb-4">
+              <span className="text-gray-500 text-sm">Kết quả:</span> <span className="font-bold">{pagination.totalItems} sản phẩm</span>
+            </div>
 
-                <div>
-                  <h4 className="text-[#594138] uppercase font-bold mb-4 text-xs tracking-widest">
-                    Hãng xe
-                  </h4>
-                  <div className="flex flex-col gap-3">
-                    {brands.map(brand => (
-                      <label key={brand.brandId} className="flex justify-between items-center text-[#594138] cursor-pointer hover:text-[#1a1c1b] transition-colors">
-                        <span className="text-sm font-bold uppercase">{brand.name}</span>
-                        <input 
-                          type="checkbox" 
-                          checked={selectedBrandIds.includes(brand.brandId.toString())}
-                          onChange={() => handleBrandChange(brand.brandId.toString())}
-                          className="w-4 h-4 text-[#a63b00] rounded border-gray-300 focus:ring-[#a63b00] cursor-pointer" 
-                        />
-                      </label>
-                    ))}
-                  </div>
-                </div>
+            {/* Filter Drawer Overlay */}
+            {isFilterOpen && (
+              <div 
+                className="fixed inset-0 bg-black/40 z-40 transition-opacity"
+                onClick={() => setIsFilterOpen(false)}
+              />
+            )}
 
-                <div>
-                  <button 
-                    type="button" 
-                    onClick={resetFilters} 
-                    className="w-full py-3 rounded-xl uppercase border border-gray-200 bg-gray-50 text-[#1a1c1b] font-bold hover:bg-[#a63b00] hover:text-white hover:border-[#a63b00] transition-colors"
-                  >
-                    Làm mới bộ lọc
+            {/* Filter Drawer */}
+            <div className={`fixed top-0 right-0 h-full w-[85%] sm:w-[400px] bg-white z-50 shadow-2xl transform transition-transform duration-300 ease-in-out flex flex-col ${isFilterOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+              <div className="p-6 overflow-y-auto flex-grow flex flex-col gap-8">
+                <div className="flex justify-between items-start mb-2">
+                  <h2 className="text-[#e02b27] text-3xl font-black italic uppercase m-0 tracking-tight leading-none max-w-[80%]">Lọc theo thông số xe</h2>
+                  <button onClick={() => setIsFilterOpen(false)} className="text-gray-400 hover:text-[#e02b27] transition-colors mt-1">
+                    <span className="material-symbols-outlined text-[28px]">close</span>
                   </button>
                 </div>
 
+                <div>
+                  <h4 className="text-[#1a1c1b] mb-4 text-[15px] font-medium">Loại xe</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {categories.map(cat => {
+                      const isSelected = selectedCategoryIds.includes(cat.categoryId.toString());
+                      return (
+                        <button 
+                          key={cat.categoryId}
+                          onClick={() => handleCategoryChange(cat.categoryId.toString())}
+                          className={`px-4 py-2 font-bold flex items-center gap-2 transition-colors ${isSelected ? 'bg-[#333] text-white' : 'bg-gray-100 text-[#1a1c1b] hover:bg-[#333] hover:text-white'}`}
+                        >
+                          {cat.name}
+                          {isSelected && <span className="material-symbols-outlined text-[16px] font-bold">check</span>}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-[#1a1c1b] mb-4 text-[15px] font-medium">Hãng xe</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {brands.map(brand => {
+                      const isSelected = selectedBrandIds.includes(brand.brandId.toString());
+                      return (
+                        <button 
+                          key={brand.brandId}
+                          onClick={() => handleBrandChange(brand.brandId.toString())}
+                          className={`px-4 py-2 font-bold flex items-center gap-2 transition-colors ${isSelected ? 'bg-[#333] text-white' : 'bg-gray-100 text-[#1a1c1b] hover:bg-[#333] hover:text-white'}`}
+                        >
+                          {brand.name}
+                          {isSelected && <span className="material-symbols-outlined text-[16px] font-bold">check</span>}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-[#1a1c1b] mb-4 text-[15px] font-medium">Mức giá</h4>
+                  
+                  {/* Dual Slider Visual */}
+                  <div className="relative w-full h-1 bg-gray-200 rounded my-8 flex items-center">
+                    <div 
+                      className="absolute h-full bg-[#e02b27] rounded"
+                      style={{ 
+                        left: `${((minPrice === '' ? MIN_PRICE_LIMIT : Math.min(minPrice, MAX_PRICE_LIMIT)) / MAX_PRICE_LIMIT) * 100}%`,
+                        right: `${100 - ((maxPrice === '' ? MAX_PRICE_LIMIT : Math.min(maxPrice, MAX_PRICE_LIMIT)) / MAX_PRICE_LIMIT) * 100}%` 
+                      }}
+                    ></div>
+                    <input 
+                      type="range" 
+                      min={MIN_PRICE_LIMIT} 
+                      max={MAX_PRICE_LIMIT} 
+                      step="1000000"
+                      value={minPrice === '' ? MIN_PRICE_LIMIT : minPrice}
+                      onChange={(e) => {
+                        const sMax = maxPrice === '' ? MAX_PRICE_LIMIT : maxPrice;
+                        const val = Math.min(Number(e.target.value), sMax - 1000000);
+                        setMinPrice(val);
+                      }}
+                      className="absolute w-full appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-[1.5px] [&::-webkit-slider-thumb]:border-gray-300 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-md cursor-pointer"
+                      style={{ zIndex: (minPrice === '' ? MIN_PRICE_LIMIT : minPrice) > MAX_PRICE_LIMIT - 1000000 ? 3 : 4 }}
+                    />
+                    <input 
+                      type="range" 
+                      min={MIN_PRICE_LIMIT} 
+                      max={MAX_PRICE_LIMIT} 
+                      step="1000000"
+                      value={maxPrice === '' ? MAX_PRICE_LIMIT : maxPrice}
+                      onChange={(e) => {
+                        const sMin = minPrice === '' ? MIN_PRICE_LIMIT : minPrice;
+                        const val = Math.max(Number(e.target.value), sMin + 1000000);
+                        setMaxPrice(val);
+                      }}
+                      className="absolute w-full appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-[1.5px] [&::-webkit-slider-thumb]:border-gray-300 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-md cursor-pointer"
+                      style={{ zIndex: 4 }}
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-4">
+                    <input 
+                      type="text"
+                      placeholder="0"
+                      value={formatPrice(minPrice)}
+                      onChange={handleMinPriceChange}
+                      className="w-full border border-gray-300 rounded py-2 px-3 text-center font-bold focus:outline-none focus:border-[#e02b27]"
+                    />
+                    <span className="text-gray-400 font-bold">-</span>
+                    <input 
+                      type="text"
+                      placeholder="2.000.000.000"
+                      value={formatPrice(maxPrice)}
+                      onChange={handleMaxPriceChange}
+                      className="w-full border border-gray-300 rounded py-2 px-3 text-center font-bold focus:outline-none focus:border-[#e02b27]"
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-auto pt-4">
+                  <button 
+                    type="button" 
+                    onClick={() => {
+                      setMinPrice('');
+                      setMaxPrice('');
+                      resetFilters();
+                    }} 
+                    className="w-full py-3 mb-2 rounded border border-gray-300 bg-white text-[#1a1c1b] font-bold hover:bg-gray-50 transition-colors"
+                  >
+                    LÀM MỚI BỘ LỌC
+                  </button>
+                </div>
               </div>
-            </aside>
+
+              <div className="p-4 border-t border-gray-100 flex justify-end">
+                <button 
+                  onClick={validateAndApplyPrice}
+                  className="flex items-center gap-2 border-[1.5px] border-[#e02b27] text-[#e02b27] px-8 py-2.5 font-bold hover:bg-[#e02b27] hover:text-white transition-colors uppercase"
+                >
+                  Lọc <span className="material-symbols-outlined font-bold text-[20px]">arrow_forward</span>
+                </button>
+              </div>
+            </div>
 
             {/* Main Content */}
-            <section className="w-full lg:w-3/4 flex flex-col">
-
-              <header className="flex justify-end mb-6 border-b border-gray-200 pb-4">
-                <div className="flex items-center gap-2 bg-white px-4 py-2 border border-gray-200 rounded-lg shadow-sm">
-                  <span className="uppercase font-bold text-[#594138] text-xs tracking-wider">
-                    Lọc theo:
-                  </span>
-                  <select 
-                    value={sort}
-                    onChange={handleSortChange}
-                    className="border-0 focus:ring-0 uppercase font-bold text-xs cursor-pointer bg-transparent text-[#1a1c1b] p-0"
-                  >
-                    <option value="price_asc">Giá: Thấp đến Cao</option>
-                    <option value="price_desc">Giá: Cao đến Thấp</option>
-                  </select>
-                </div>
-              </header>
+            <section className="w-full flex flex-col mt-2">
 
               {loading ? (
                 <div className="flex justify-center py-12 md:py-20">
@@ -249,7 +417,7 @@ const FilterPage: React.FC = () => {
                   </p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                   {products.map(product => {
                     const discountedPrice = product.discountedPrice;
 
@@ -295,12 +463,12 @@ const FilterPage: React.FC = () => {
                                   <span className="text-[#594138] line-through block text-xs mb-0.5">
                                     {product.basePrice.toLocaleString('vi-VN')} ₫
                                   </span>
-                                  <span className="font-black text-xl text-[#a63b00]">
+                                  <span className="font-bold text-xl text-[#a63b00]">
                                     {discountedPrice.toLocaleString('vi-VN')} ₫
                                   </span>
                                 </div>
                               ) : (
-                                <span className="font-black text-xl text-[#1a1c1b]">
+                                <span className="font-bold text-xl text-[#1a1c1b]">
                                   {product.basePrice.toLocaleString('vi-VN')} ₫
                                 </span>
                               )}
@@ -359,7 +527,6 @@ const FilterPage: React.FC = () => {
               )}
 
             </section>
-
           </div>
         </main>
       </div>

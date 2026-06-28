@@ -182,7 +182,7 @@ const CartPage: React.FC = () => {
   return (
     <div className="pt-[56px] bg-gray-50 font-sans text-[#1a1c1b] min-h-screen flex flex-col">
       <main className="flex-grow container mx-auto px-4 py-8 md:py-12 max-w-7xl">
-        <h1 className="text-2xl md:text-3xl font-black text-[#1a1c1b] mb-6 md:mb-10 tracking-tight">
+        <h1 className="text-2xl md:text-3xl font-bold text-[#1a1c1b] mb-6 md:mb-10 tracking-tight">
           Giỏ hàng của bạn
         </h1>
 
@@ -279,7 +279,7 @@ const CartPage: React.FC = () => {
                             </div>
 
                             {/* Total price for this item (mobile hidden) */}
-                            <div className="hidden lg:block text-right font-black text-[#a63b00] w-32 flex-shrink-0">
+                            <div className="hidden lg:block text-right font-bold text-[#a63b00] w-32 flex-shrink-0">
                               {(price * cart.quantity).toLocaleString('vi-VN')} VNĐ
                             </div>
 
@@ -346,7 +346,7 @@ const CartPage: React.FC = () => {
 
                   <div className="flex justify-between items-center pt-4 border-t border-gray-100">
                     <span className="text-lg font-bold text-[#1a1c1b]">Tổng cộng</span>
-                    <span className="text-2xl font-black text-[#a63b00]">{grandTotal.toLocaleString('vi-VN')} VNĐ</span>
+                    <span className="text-2xl font-bold text-[#a63b00]">{grandTotal.toLocaleString('vi-VN')} VNĐ</span>
                   </div>
                 </div>
 

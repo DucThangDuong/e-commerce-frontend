@@ -7,6 +7,7 @@ import DetailPage from "./pages/DetailPage";
 import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import PurchasePage from "./pages/PurchasePage";
+import ProfilePage from "./pages/ProfilePage";
 import MainLayout from "./layouts/MainLayout";
 import {
   BrowserRouter,
@@ -99,6 +100,7 @@ function App() {
             <Route path="/cart" element={<CartPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/purchase" element={<PurchasePage />} />
+            <Route path="/profile" element={<ProfilePage />} />
           </Route>
         </Route>
       </Routes>

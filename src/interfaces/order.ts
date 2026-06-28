@@ -70,3 +70,15 @@ export interface ApplyCouponResponse {
   discountType: string;
   discountValue: number;
 }
+
+export interface ResCancellationReasonDto {
+  reasonId: number;
+  code: string;
+  content: string;
+  displayOrder: number;
+}
+
+export interface CancelOrderReqDto {
+  orderId: number;
+  reason: string;
+}

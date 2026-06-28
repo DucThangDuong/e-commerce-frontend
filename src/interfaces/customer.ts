@@ -5,4 +5,7 @@ export interface ResCustomerPrivateDto {
   email?: string | null;
   address?: string | null;
   phoneNumber?: string | null;
+  maskedPhoneNumber?: string | null;
+  isGoogleLinked?: boolean;
+  totalOrders?: number;
 }

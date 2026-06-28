@@ -28,28 +28,28 @@ const MainLayout: React.FC = () => {
       <nav className="fixed top-0 left-0 right-0 w-full bg-white/75 backdrop-blur-xl border-b border-gray-200 shadow-sm z-50">
         <div className="container mx-auto px-4 max-w-7xl flex justify-between items-center py-3">
           
-          <Link to="/" className="text-2xl font-black italic text-gray-900 uppercase tracking-tighter hover:text-gray-700 transition-colors font-['Space_Grotesk',sans-serif]">
+          <Link to="/" className="text-2xl font-black italic text-gray-900 uppercase tracking-tighter hover:text-[#a63b00] transition-colors font-['Space_Grotesk',sans-serif]">
             PRECISION MOTORS
           </Link>
 
           <div className="hidden lg:flex items-center gap-8 font-bold uppercase tracking-tight text-sm">
-            <Link to="/" className="text-gray-900 hover:text-[#0d6efd] transition-colors">Trang chủ</Link>
-            <Link to="/categories" className="text-gray-900 hover:text-[#0d6efd] transition-colors">Danh mục</Link>
-            {isLogin && <Link to="/purchase" className="text-gray-900 hover:text-[#0d6efd] transition-colors">Đơn hàng</Link>}
+            <Link to="/" className="text-gray-900 hover:text-[#a63b00] transition-colors">Trang chủ</Link>
+            <Link to="/categories" className="text-gray-900 hover:text-[#a63b00] transition-colors">Danh mục</Link>
+            {isLogin && <Link to="/purchase" className="text-gray-900 hover:text-[#a63b00] transition-colors">Đơn hàng</Link>}
             {/* TODO: Add Admin check using your role system */}
-            {/* <Link to="/admin" className="text-[#0d6efd] hover:text-blue-700 transition-colors">Quản lý</Link> */}
+            {/* <Link to="/admin" className="text-[#a63b00] hover:text-[#8a3100] transition-colors">Quản lý</Link> */}
           </div>
 
           <div className="flex items-center gap-6">
             <form action="/categories" method="GET" className="hidden md:flex relative m-0">
-              <input type="text" name="q" className="rounded-full pl-4 pr-10 py-2 border border-gray-300 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#0d6efd] focus:border-transparent text-sm w-56" placeholder="Tìm kiếm xe..." />
-              <button type="submit" className="absolute right-0 top-1/2 -translate-y-1/2 text-gray-500 pr-3 hover:text-gray-700 flex items-center">
+              <input type="text" name="q" className="rounded-full pl-4 pr-10 py-2 border border-gray-300 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#a63b00] focus:border-transparent text-sm w-56" placeholder="Tìm kiếm xe..." />
+              <button type="submit" className="absolute right-0 top-1/2 -translate-y-1/2 text-gray-500 pr-3 hover:text-[#a63b00] flex items-center transition-colors">
                 <span className="material-symbols-outlined text-xl">search</span>
               </button>
             </form>
 
             {isLogin && (
-              <Link to="/cart" className="text-gray-900 hover:text-gray-700 relative flex items-center">
+              <Link to="/cart" className="text-gray-900 hover:text-[#a63b00] relative flex items-center transition-colors">
                 <span className="material-symbols-outlined text-3xl">shopping_cart</span>
               </Link>
             )}
@@ -71,7 +71,7 @@ const MainLayout: React.FC = () => {
               ) : (
                 <div className="flex gap-2">
                   <Link to="/login" className="bg-gray-100 hover:bg-gray-200 font-bold px-4 py-2 text-sm rounded text-gray-900 transition-colors">Đăng nhập</Link>
-                  <Link to="/register" className="bg-[#0d6efd] hover:bg-blue-700 text-white text-sm font-bold px-4 py-2 rounded shadow-sm transition-colors">Đăng ký</Link>
+                  <Link to="/register" className="bg-[#a63b00] hover:bg-[#8a3100] text-white text-sm font-bold px-4 py-2 rounded shadow-sm transition-colors">Đăng ký</Link>
                 </div>
               )}
             </div>
@@ -85,7 +85,7 @@ const MainLayout: React.FC = () => {
       </div>
 
       {/* Footer */}
-      <footer className="bg-gray-900 relative text-white pt-16 pb-8 mt-12 z-10">
+      <footer className="bg-gray-900 relative text-white pt-16 pb-8 z-10">
         <div className="container mx-auto px-4 max-w-7xl">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-12">
             <div className="lg:col-span-4">

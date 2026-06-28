@@ -274,10 +274,10 @@ const DetailPage: React.FC = () => {
           {/* Top Section */}
           <div className="flex flex-col lg:flex-row items-start mb-20 pt-4 lg:pt-10 lg:min-h-[620px]">
             <div className="w-full lg:w-1/3 lg:pl-12 order-2 lg:order-2 mt-10 lg:mt-0 z-10">
-              <h1 className="text-4xl md:text-5xl font-black text-[#1a1c1b] mb-6 uppercase tracking-wider leading-tight">
+              <h1 className="text-4xl md:text-5xl font-bold text-[#1a1c1b] mb-6 uppercase tracking-wider leading-tight">
                 {product.name}
               </h1>
-              <h2 className="text-[#a63b00] italic font-black uppercase mb-8 text-2xl tracking-wider">
+              <h2 className="text-[#a63b00] italic font-bold uppercase mb-8 text-2xl tracking-wider">
                 GIÁ & MÀU SẮC
               </h2>
               
@@ -289,10 +289,10 @@ const DetailPage: React.FC = () => {
                     className="flex flex-col items-center cursor-pointer relative group w-12"
                     onClick={() => { setSelectedColor(color); setQuantity(1); }}
                   >
-                    <div className={`mt-2 text-sm transition-colors ${selectedColor?.colorId === color.colorId ? 'text-[#1a1c1b] font-bold' : 'text-[#594138] font-medium group-hover:text-[#1a1c1b]'}`}>
+                    <div className={`mt-2 text-sm text-center transition-colors ${selectedColor?.colorId === color.colorId ? 'text-[#1a1c1b] font-bold' : 'text-[#594138] font-medium group-hover:text-[#1a1c1b]'}`}>
                       {color.colorName}
                     </div>
-                    <div className={`absolute -bottom-2 h-[2px] w-6 transition-colors ${selectedColor?.colorId === color.colorId ? 'bg-[#a63b00]' : 'bg-transparent'}`}></div>
+                    <div className={`absolute -bottom-2 h-[2px] w-full transition-colors ${selectedColor?.colorId === color.colorId ? 'bg-[#a63b00]' : 'bg-transparent'}`}></div>
                   </div>
                 ))}
               </div>
@@ -303,7 +303,7 @@ const DetailPage: React.FC = () => {
                 <div className="flex items-center gap-4">
                   <div className="flex flex-col">
                     <div className="flex items-baseline gap-2">
-                      <span className="font-black text-[#1a1c1b] text-4xl tracking-tighter">
+                      <span className="font-bold text-[#1a1c1b] text-4xl tracking-tighter">
                         {finalPrice.toLocaleString('vi-VN')}
                       </span>
                       <span className="text-[#594138] font-bold text-lg">VNĐ</span>
@@ -376,8 +376,8 @@ const DetailPage: React.FC = () => {
             <section className="mt-20 pt-20 border-t border-gray-200">
               <div className="flex flex-col lg:flex-row items-center gap-12">
                 <div className="w-full lg:w-1/3 lg:pl-12">
-                  <h3 className="text-[#a63b00] italic font-black uppercase mb-6 text-2xl tracking-wider">THIẾT KẾ</h3>
-                  <h4 className="text-3xl font-black tracking-tight text-[#1a1c1b] mb-6 leading-snug">
+                  <h3 className="text-[#a63b00] italic font-bold uppercase mb-6 text-2xl tracking-wider">THIẾT KẾ</h3>
+                  <h4 className="text-3xl font-bold tracking-tight text-[#1a1c1b] mb-6 leading-snug">
                     Thiết kế huyền thoại, đậm chất cổ điển
                   </h4>
                   <p className="text-[#594138] leading-relaxed text-[0.95rem]">
@@ -428,7 +428,7 @@ const DetailPage: React.FC = () => {
           {/* Reviews Section */}
           <section className="mt-20 pt-20 border-t border-gray-200">
             <div className="flex items-center justify-between mb-6 md:mb-10">
-              <h2 className="text-3xl font-black tracking-tight text-[#1a1c1b] m-0">Đánh giá từ khách hàng</h2>
+              <h2 className="text-3xl font-bold tracking-tight text-[#1a1c1b] m-0">Đánh giá từ khách hàng</h2>
               <span className="bg-gray-100 text-[#1a1c1b] border border-gray-200 px-4 py-2 text-sm rounded-full font-medium">
                 {comments.length} đánh giá
               </span>

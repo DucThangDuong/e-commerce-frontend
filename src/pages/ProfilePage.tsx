@@ -47,7 +47,6 @@ const ProfilePage: React.FC = () => {
   const [passwordForm, setPasswordForm] = useState({ oldPassword: '', newPassword: '', confirmPassword: '' });
 
   // Map Picker State
-  const [mapPosition, setMapPosition] = useState<[number, number] | null>(null);
   const [tempPosition, setTempPosition] = useState<L.LatLng | null>(null);
   const [showMapModal, setShowMapModal] = useState(false);
   const [isGeocoding, setIsGeocoding] = useState(false);
@@ -60,7 +59,6 @@ const ProfilePage: React.FC = () => {
       const data = await res.json();
       if (data && data.display_name) {
         setEditForm(prev => ({...prev, address: data.display_name}));
-        setMapPosition([tempPosition.lat, tempPosition.lng]);
         setShowMapModal(false);
       } else {
         showNotification('Không tìm thấy địa chỉ cho vị trí này', 'error');

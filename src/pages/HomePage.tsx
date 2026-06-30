@@ -72,6 +72,114 @@ const Countdown = ({ endDate }: { endDate: string }) => {
   );
 };
 
+const PromoCarousel = ({ promo }: { promo: ResPromotionWithProductsDto }) => {
+  const scrollRef = React.useRef<HTMLDivElement>(null);
+  const [isScrollable, setIsScrollable] = React.useState(false);
+
+  React.useEffect(() => {
+    const checkScrollable = () => {
+      if (scrollRef.current) {
+        setIsScrollable(scrollRef.current.scrollWidth > scrollRef.current.clientWidth);
+      }
+    };
+
+    checkScrollable();
+    window.addEventListener('resize', checkScrollable);
+    return () => window.removeEventListener('resize', checkScrollable);
+  }, [promo.products]);
+
+  const scrollLeft = () => {
+    if (scrollRef.current) scrollRef.current.scrollBy({ left: -320, behavior: 'smooth' });
+  };
+
+  const scrollRight = () => {
+    if (scrollRef.current) scrollRef.current.scrollBy({ left: 320, behavior: 'smooth' });
+  };
+
+  return (
+    <section className="w-full bg-gradient-to-r from-[#8a3100] to-[#a63b00] py-12 md:py-20 relative overflow-hidden">
+      {/* Background pattern */}
+      <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle, #fff 2px, transparent 2px)', backgroundSize: '20px 20px' }}></div>
+      
+      <div className="container mx-auto px-4 max-w-7xl relative z-10">
+        <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+          <div className="flex items-center gap-4">
+            <span className="material-symbols-outlined text-yellow-300 text-5xl animate-pulse">bolt</span>
+            <h2 className="text-3xl md:text-4xl font-black text-yellow-300 italic tracking-wider uppercase">
+              {promo.name}
+            </h2>
+          </div>
+          <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6">
+            <Countdown endDate={promo.endDate} />
+            
+            {/* Control buttons */}
+            {isScrollable && (
+              <div className="hidden md:flex gap-2">
+                <button 
+                  onClick={scrollLeft} 
+                  className="w-10 h-10 rounded-full bg-white/20 text-white flex items-center justify-center hover:bg-white hover:text-[#a63b00] transition-colors shadow-sm"
+                >
+                  <span className="material-symbols-outlined">chevron_left</span>
+                </button>
+                <button 
+                  onClick={scrollRight} 
+                  className="w-10 h-10 rounded-full bg-white/20 text-white flex items-center justify-center hover:bg-white hover:text-[#a63b00] transition-colors shadow-sm"
+                >
+                  <span className="material-symbols-outlined">chevron_right</span>
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Carousel Container */}
+        <div 
+          ref={scrollRef} 
+          className="flex gap-4 overflow-x-auto snap-x scroll-smooth pb-4 -mx-4 px-4 md:mx-0 md:px-0 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+        >
+          {promo.products.map(item => {
+            const usedSlots = item.totalSlots - item.remainingSlots;
+            const progressPercent = item.totalSlots > 0 ? Math.min(100, Math.round((usedSlots / item.totalSlots) * 100)) : 0;
+            const displayImage = item.imageUrl || "https://via.placeholder.com/300";
+
+            return (
+              <Link key={item.productId} to={`/product/${item.productId}`} className="bg-white rounded-xl shadow-md p-4 flex flex-col hover:-translate-y-1 transition-transform group relative shrink-0 snap-start w-[260px] md:w-[280px] lg:w-[280px]">
+                <div className="absolute top-2 left-2 z-10 bg-red-600 text-white px-2 py-0.5 rounded text-[10px] font-bold">
+                  {promo.name}
+                </div>
+                <div className="h-48 w-full mb-4 flex items-center justify-center p-2 bg-gray-50 rounded-lg">
+                  <img src={displayImage} alt={item.name} className="max-h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform" />
+                </div>
+                <div className="flex flex-col flex-grow">
+                  <h3 className="font-bold text-[15px] text-[#1a1c1b] line-clamp-2 mb-2 leading-tight flex-grow">{item.name}</h3>
+                  <div className="mb-3">
+                    <span className="text-[#a63b00] font-black text-xl block leading-none">{item.discountedPrice.toLocaleString('vi-VN')}₫</span>
+                    <span className="text-gray-400 line-through text-sm">{item.basePrice.toLocaleString('vi-VN')}₫</span>
+                  </div>
+                  
+                  {/* Progress Bar */}
+                  <div className="mt-auto pt-2">
+                    <div className="relative w-full h-6 bg-red-200 rounded-full overflow-hidden flex items-center justify-center">
+                      <div 
+                        className="absolute top-0 left-0 h-full bg-gradient-to-r from-red-500 to-red-600 rounded-full"
+                        style={{ width: `${progressPercent}%` }}
+                      ></div>
+                      <div className="absolute inset-0 flex items-center justify-center gap-1 z-10 text-white text-[11px] font-bold drop-shadow-md uppercase tracking-wider">
+                        <span className="material-symbols-outlined text-[14px] text-yellow-300">local_fire_department</span>
+                        Còn {item.remainingSlots}/{item.totalSlots}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+};
+
 const HomePage: React.FC = () => {
   const [featuredProducts, setFeaturedProducts] = useState<ResSimpleFeaturedProductDto[]>([]);
   const [promotions, setPromotions] = useState<ResPromotionWithProductsDto[]>([]);
@@ -163,7 +271,7 @@ const HomePage: React.FC = () => {
                <Link to={`/product/${currentProduct.productId}`} className="w-full h-full flex items-end md:items-center justify-center group relative cursor-pointer pointer-events-auto">
                   <img src={currentProduct.firstColorImageUrl || "https://via.placeholder.com/600x400?text=No+Image"} 
                     alt="Featured Motorcycle" 
-                    className="relative w-[110%] sm:w-[90%] md:w-[130%] h-auto max-h-[100%] md:max-h-[85%] object-contain transition-transform duration-500 ease-out group-hover:scale-105 mix-blend-multiply drop-shadow-2xl"
+                    className="relative w-[110%] sm:w-[90%] md:w-[130%] h-auto max-h-[100%] md:max-h-[85%] object-contain transition-transform duration-500 ease-out group-hover:scale-105 mix-blend-multiply"
                   />
                </Link>
              ) : (
@@ -253,70 +361,10 @@ const HomePage: React.FC = () => {
 
       {/* Promotions / Flash Sale Section replacing Top Products */}
       {promotions.map(promo => (
-        <section key={promo.promotionId} className="w-full bg-gradient-to-r from-[#8a3100] to-[#a63b00] py-12 md:py-20 relative overflow-hidden">
-          {/* Background pattern */}
-          <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle, #fff 2px, transparent 2px)', backgroundSize: '20px 20px' }}></div>
-          
-          <div className="container mx-auto px-4 max-w-7xl relative z-10">
-            <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-              <div className="flex items-center gap-4">
-                <span className="material-symbols-outlined text-yellow-300 text-5xl animate-pulse">bolt</span>
-                <h2 className="text-3xl md:text-4xl font-black text-yellow-300 italic tracking-wider uppercase">
-                  {promo.name}
-                </h2>
-              </div>
-              <Countdown endDate={promo.endDate} />
-            </div>
-
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-              {promo.products.map(item => {
-                const usedSlots = item.totalSlots - item.remainingSlots;
-                const progressPercent = item.totalSlots > 0 ? Math.min(100, Math.round((usedSlots / item.totalSlots) * 100)) : 0;
-                const displayImage = item.imageUrl || "https://via.placeholder.com/300";
-
-                return (
-                  <Link key={item.productId} to={`/product/${item.productId}`} className="bg-white rounded-xl shadow-md p-3 flex flex-col hover:-translate-y-1 transition-transform group relative">
-                    <div className="absolute top-2 left-2 z-10 bg-red-600 text-white px-2 py-0.5 rounded text-[10px] font-bold">
-                      {promo.name}
-                    </div>
-                    <div className="h-40 w-full mb-3 flex items-center justify-center p-2 bg-gray-50 rounded-lg">
-                      <img src={displayImage} alt={item.name} className="max-h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform" />
-                    </div>
-                    <div className="flex flex-col flex-grow">
-                      <h3 className="font-bold text-sm text-[#1a1c1b] line-clamp-2 mb-2 leading-tight flex-grow">{item.name}</h3>
-                      <div className="mb-2">
-                        <span className="text-[#a63b00] font-black text-lg block leading-none">{item.discountedPrice.toLocaleString('vi-VN')}₫</span>
-                        <span className="text-gray-400 line-through text-xs">{item.basePrice.toLocaleString('vi-VN')}₫</span>
-                      </div>
-                      
-                      {/* Progress Bar */}
-                      <div className="mt-auto pt-2">
-                        <div className="relative w-full h-5 bg-red-200 rounded-full overflow-hidden flex items-center justify-center">
-                          <div 
-                            className="absolute top-0 left-0 h-full bg-gradient-to-r from-red-500 to-red-600 rounded-full"
-                            style={{ width: `${progressPercent}%` }}
-                          ></div>
-                          <div className="absolute inset-0 flex items-center justify-center gap-1 z-10 text-white text-[10px] font-bold drop-shadow-md uppercase">
-                            <span className="material-symbols-outlined text-[12px] text-yellow-300">local_fire_department</span>
-                            Còn {item.remainingSlots}/{item.totalSlots} suất
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-            
-            <div className="mt-8 text-center">
-              <Link to="/categories" className="inline-block bg-white/20 hover:bg-white/30 text-white px-6 py-2 rounded-full font-bold text-sm transition-colors border border-white/50">
-                Xem tất cả
-              </Link>
-            </div>
-          </div>
-        </section>
+        <PromoCarousel key={promo.promotionId} promo={promo} />
       ))}
     </main>
   );
 };
+
 export default HomePage;

@@ -138,141 +138,151 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen pt-[56px] flex flex-col overflow-hidden bg-gray-50 text-[#1a1c1b] font-sans">
-      <div className="flex flex-grow overflow-hidden relative">
-        <main className="flex-grow h-full overflow-y-auto p-4 scroll-smooth">
-          <div className="container mx-auto flex items-center justify-center h-full py-8 md:py-12">
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 w-full overflow-hidden max-w-[480px]">
-              <div className="p-6 md:p-10 flex flex-col gap-6">
-                
-                <div className="text-center">
-                  <h1 className="text-2xl font-bold tracking-tight text-[#1a1c1b] mb-2 tracking-tight">
-                    Chào mừng trở lại
-                  </h1>
-                  <p className="text-[#594138] mb-0">
-                    Vui lòng nhập thông tin đăng nhập của bạn.
-                  </p>
-                </div>
+    <div className="min-h-screen pt-[80px] flex flex-col bg-[#f9f9f7] text-[#1a1c1b] font-sans relative overflow-hidden">
+      {/* Background Decor */}
+      <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-gray-200/50 to-transparent pointer-events-none"></div>
+      <div className="absolute -top-40 -right-40 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute top-40 -left-40 w-96 h-96 bg-orange-400/5 rounded-full blur-3xl pointer-events-none"></div>
 
-                <div className="flex justify-center w-full">
-                  <GoogleLogin
-                    onSuccess={(credentialResponse) => {
-                      if (credentialResponse.credential) {
-                        handleGoogleLogin(credentialResponse.credential);
-                      }
-                    }}
-                    onError={() => {
-                      setError("Đăng nhập bằng Google thất bại.");
-                    }}
-                    size="large"
-                    width="400"
-                    text="signin_with"
-                    shape="rectangular"
+      <main className="flex-grow flex items-center justify-center p-4 relative z-10 pb-20">
+        <div className="bg-white/80 backdrop-blur-xl rounded-[2rem] shadow-xl shadow-gray-200/50 border border-white w-full overflow-hidden max-w-[480px] relative">
+          <div className="p-8 md:p-10 flex flex-col gap-6 relative z-10">
+            
+            <div className="text-center mb-2">
+              <h1 className="text-3xl font-heading font-black tracking-tight text-[#1a1c1b] uppercase">
+                Chào mừng trở lại
+              </h1>
+              <p className="text-gray-500 text-sm mt-2 font-medium">
+                Vui lòng nhập thông tin đăng nhập của bạn.
+              </p>
+            </div>
+
+            <div className="flex justify-center w-full">
+              <GoogleLogin
+                onSuccess={(credentialResponse) => {
+                  if (credentialResponse.credential) {
+                    handleGoogleLogin(credentialResponse.credential);
+                  }
+                }}
+                onError={() => {
+                  setError("Đăng nhập bằng Google thất bại.");
+                }}
+                size="large"
+                width="400"
+                text="signin_with"
+                shape="rectangular"
+              />
+            </div>
+
+            <div className="flex items-center gap-3 py-2">
+              <hr className="flex-grow m-0 border-t-2 border-dashed border-gray-100" />
+              <span className="text-gray-400 font-heading font-bold uppercase text-[10px] tracking-widest">Hoặc</span>
+              <hr className="flex-grow m-0 border-t-2 border-dashed border-gray-100" />
+            </div>
+
+            <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+              {registered && (
+                <div className="bg-green-50 border border-green-100 text-green-600 p-4 rounded-xl text-sm font-medium text-center flex items-center justify-center gap-2">
+                  <span className="material-symbols-outlined text-lg">check_circle</span>
+                  Đăng ký thành công! Vui lòng đăng nhập.
+                </div>
+              )}
+              {message && (
+                <div className="bg-green-50 border border-green-100 text-green-600 p-4 rounded-xl text-sm font-medium text-center flex items-center justify-center gap-2">
+                  <span className="material-symbols-outlined text-lg">info</span>
+                  {message}
+                </div>
+              )}
+              {error && (
+                <div className="bg-red-50 border border-red-100 text-red-600 p-4 rounded-xl text-sm font-medium text-center flex items-center justify-center gap-2">
+                  <span className="material-symbols-outlined text-lg">error</span>
+                  {error}
+                </div>
+              )}
+
+              <div>
+                <label className="block text-gray-500 font-heading font-bold uppercase text-[11px] tracking-widest mb-2">Email</label>
+                <div className="relative flex items-center group">
+                  <span className="absolute left-4 text-gray-400 flex items-center group-focus-within:text-primary transition-colors">
+                    <span className="material-symbols-outlined text-xl">mail</span>
+                  </span>
+                  <input 
+                    type="email" 
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full pl-12 pr-4 py-3.5 bg-gray-50/50 border-2 border-gray-100 rounded-xl focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary focus:bg-white hover:bg-white transition-all text-sm font-medium" 
+                    placeholder="name@example.com" 
+                    required 
                   />
                 </div>
+              </div>
 
-                <div className="flex items-center gap-2 py-1">
-                  <hr className="flex-grow m-0 border-t border-gray-200" />
-                  <span className="text-gray-400 text-sm">Hoặc</span>
-                  <hr className="flex-grow m-0 border-t border-gray-200" />
+              <div>
+                <label className="block text-gray-500 font-heading font-bold uppercase text-[11px] tracking-widest mb-2">Mật khẩu</label>
+                <div className="relative flex items-center group">
+                  <span className="absolute left-4 text-gray-400 flex items-center group-focus-within:text-primary transition-colors">
+                    <span className="material-symbols-outlined text-xl">lock</span>
+                  </span>
+                  <input 
+                    type="password" 
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full pl-12 pr-4 py-3.5 bg-gray-50/50 border-2 border-gray-100 rounded-xl focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary focus:bg-white hover:bg-white transition-all text-sm font-medium [&::-ms-reveal]:hidden [&::-ms-clear]:hidden" 
+                    placeholder="••••••••" 
+                    required 
+                  />
                 </div>
-
-                <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                  {registered && (
-                    <div className="bg-green-50 text-green-600 p-3 rounded-lg text-sm text-center">
-                      Đăng ký thành công! Vui lòng đăng nhập.
-                    </div>
-                  )}
-                  {message && (
-                    <div className="bg-green-50 text-green-600 p-3 rounded-lg text-sm text-center">
-                      {message}
-                    </div>
-                  )}
-                  {error && (
-                    <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm text-center">
-                      {error}
-                    </div>
-                  )}
-
-                  <div>
-                    <label className="block font-bold text-sm mb-2 text-[#1a1c1b] tracking-wide">Email</label>
-                    <div className="relative flex items-center">
-                      <span className="absolute left-3 text-gray-400 flex items-center">
-                        <span className="material-symbols-outlined text-xl">mail</span>
-                      </span>
-                      <input 
-                        type="email" 
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#a63b00] focus:border-transparent transition-all" 
-                        placeholder="name@example.com" 
-                        required 
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block font-bold text-sm mb-2 text-[#1a1c1b] tracking-wide">Mật khẩu</label>
-                    <div className="relative flex items-center">
-                      <span className="absolute left-3 text-gray-400 flex items-center">
-                        <span className="material-symbols-outlined text-xl">lock</span>
-                      </span>
-                      <input 
-                        type="password" 
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#a63b00] focus:border-transparent transition-all" 
-                        placeholder="••••••••" 
-                        required 
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex justify-between items-center mt-1">
-                    <div className="flex items-center">
-                      <input 
-                        type="checkbox" 
-                        id="rememberMe" 
-                        checked={rememberMe}
-                        onChange={(e) => setRememberMe(e.target.checked)}
-                        className="w-4 h-4 text-[#a63b00] rounded border-gray-300 focus:ring-[#a63b00] cursor-pointer" 
-                      />
-                      <label htmlFor="rememberMe" className="ml-2 text-sm text-[#1a1c1b] cursor-pointer">
-                        Nhớ tôi
-                      </label>
-                    </div>
-                    <Link to="/forgot-password" className="text-[#a63b00] hover:text-[#8a3100] font-medium hover:underline text-sm">
-                      Quên mật khẩu?
-                    </Link>
-                  </div>
-
-                  <button 
-                    type="submit" 
-                    disabled={isLoading}
-                    className="w-full bg-[#a63b00] hover:bg-[#8a3100] text-white font-bold py-3 mt-2 rounded-xl shadow-sm transition-colors h-12 disabled:opacity-70 flex justify-center items-center"
-                  >
-                    {isLoading ? (
-                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-white/30 border-t-white"></div>
-                    ) : (
-                      "Đăng nhập"
-                    )}
-                  </button>
-                </form>
               </div>
 
-              <div className=" pt-4 py-5 border-t border-gray-100 text-center">
-                <p className="text-[#594138] text-[0.875rem] mb-0">
-                  Chưa có tài khoản?{' '}
-                  <Link to="/register" className="text-[#a63b00] hover:text-[#8a3100] font-bold no-underline">
-                    Đăng ký ngay
-                  </Link>
-                </p>
+              <div className="flex justify-between items-center mt-1">
+                <label className="flex items-center gap-2 cursor-pointer group">
+                  <div className="relative flex items-center justify-center">
+                    <input 
+                      type="checkbox" 
+                      id="rememberMe" 
+                      checked={rememberMe}
+                      onChange={(e) => setRememberMe(e.target.checked)}
+                      className="peer hidden" 
+                    />
+                    <div className="w-5 h-5 rounded border-2 border-gray-200 peer-checked:border-primary peer-checked:bg-primary transition-colors flex items-center justify-center group-hover:border-primary/50">
+                      <span className="material-symbols-outlined text-white text-[14px] opacity-0 peer-checked:opacity-100 transition-opacity">check</span>
+                    </div>
+                  </div>
+                  <span className="text-sm font-medium text-gray-600 group-hover:text-[#1a1c1b] transition-colors">Nhớ tôi</span>
+                </label>
+                <Link to="/forgot-password" className="text-primary hover:text-primary-hover font-bold hover:underline text-sm transition-colors">
+                  Quên mật khẩu?
+                </Link>
               </div>
 
-            </div>
+              <button 
+                type="submit" 
+                disabled={isLoading}
+                className="w-full bg-primary hover:bg-primary-hover text-white font-heading font-bold uppercase tracking-widest text-[13px] py-4 mt-4 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all disabled:opacity-70 disabled:hover:translate-y-0 disabled:hover:shadow-lg flex justify-center items-center gap-2 relative overflow-hidden group/btn"
+              >
+                {isLoading ? (
+                  <div className="animate-spin rounded-full h-5 w-5 border-2 border-white/30 border-t-white"></div>
+                ) : (
+                  <>
+                    <span>Đăng nhập</span>
+                    <span className="material-symbols-outlined text-xl transition-transform group-hover/btn:translate-x-1">arrow_forward</span>
+                  </>
+                )}
+              </button>
+            </form>
           </div>
-        </main>
-      </div>
+
+          <div className="p-6 bg-gray-50/50 border-t border-gray-100 text-center">
+            <p className="text-gray-500 font-medium text-sm m-0">
+              Chưa có tài khoản?{' '}
+              <Link to="/register" className="text-primary hover:text-primary-hover font-heading font-black uppercase tracking-wider no-underline hover:underline ml-1">
+                Đăng ký ngay
+              </Link>
+            </p>
+          </div>
+
+        </div>
+      </main>
     </div>
   );
 };

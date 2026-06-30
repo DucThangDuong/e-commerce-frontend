@@ -11,6 +11,12 @@ interface ApiResponse<T> {
   data: T;
 }
 
+const Skeleton = ({ className }: { className?: string }) => (
+  <div className={`relative overflow-hidden bg-gray-200 ${className}`}>
+    <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/50 to-transparent animate-shimmer"></div>
+  </div>
+);
+
 const FilterPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -225,59 +231,62 @@ const FilterPage: React.FC = () => {
           <div className="flex flex-col gap-6 w-full">
             
             {/* Header: Search, Filter Toggle, Result Count */}
-            <header className="flex flex-col md:flex-row items-center justify-between mb-2 pb-4 border-b border-gray-200 gap-4">
+            <header className="flex flex-col md:flex-row items-center justify-between mb-6 pb-6 border-b border-gray-200 gap-4">
               <div className="flex items-center gap-4 w-full md:w-auto">
-                <form onSubmit={handleSearchSubmit} className="relative w-full md:w-[350px]">
+                <form onSubmit={handleSearchSubmit} className="relative w-full md:w-[400px]">
                   <input 
                     type="text" 
-                    placeholder="Nhập tên loại xe" 
+                    placeholder="Tìm kiếm dòng xe yêu thích..." 
                     value={localQuery}
                     onChange={(e) => setLocalQuery(e.target.value)}
-                    className="w-full border border-gray-300 bg-white py-3 px-5 pr-12 focus:outline-none focus:border-[#a63b00] text-gray-700"
+                    className="w-full border-2 border-gray-200 rounded-full bg-white py-3 px-6 pr-14 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 text-gray-700 font-medium transition-all shadow-sm"
                   />
-                  <button type="submit" className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#a63b00]">
-                    <span className="material-symbols-outlined text-[24px]">search</span>
+                  <button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 text-white bg-primary hover:bg-primary-hover w-10 h-10 rounded-full flex items-center justify-center transition-colors shadow-sm">
+                    <span className="material-symbols-outlined text-[20px]">search</span>
                   </button>
                 </form>
                 
                 <button 
                   onClick={() => setIsFilterOpen(true)}
-                  className="w-[48px] h-[48px] shrink-0 rounded-full border-[1.5px] border-[#e02b27] flex items-center justify-center text-[#e02b27] hover:bg-[#e02b27] hover:text-white transition-colors"
+                  className="shrink-0 rounded-full border-2 border-primary bg-primary/5 flex items-center justify-center gap-2 px-5 py-3 text-primary hover:bg-primary hover:text-white transition-all font-heading font-bold tracking-wider uppercase text-sm shadow-sm"
                 >
-                  <span className="material-symbols-outlined text-[24px]">filter_alt</span>
+                  <span className="material-symbols-outlined text-[20px]">filter_alt</span>
+                  <span className="hidden sm:inline">Bộ lọc</span>
                 </button>
 
-                <div className="hidden md:flex flex-col pl-4 border-l border-gray-200">
-                  <span className="text-gray-500 text-sm">Kết quả:</span>
-                  <span className="font-bold text-lg leading-tight">{pagination.totalItems} sản phẩm</span>
+                <div className="hidden md:flex flex-col pl-6 border-l border-gray-200">
+                  <span className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Kết quả tìm kiếm</span>
+                  <span className="font-heading font-black text-2xl text-[#1a1c1b] leading-none">{pagination.totalItems} <span className="text-sm font-medium font-sans">sản phẩm</span></span>
                 </div>
               </div>
             </header>
 
-            <div className="md:hidden mb-4">
-              <span className="text-gray-500 text-sm">Kết quả:</span> <span className="font-bold">{pagination.totalItems} sản phẩm</span>
+            <div className="md:hidden mb-4 bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex justify-between items-center">
+              <span className="text-gray-500 font-medium">Kết quả tìm kiếm:</span> 
+              <span className="font-heading font-black text-xl text-primary">{pagination.totalItems} sản phẩm</span>
             </div>
 
             {/* Filter Drawer Overlay */}
             {isFilterOpen && (
               <div 
-                className="fixed inset-0 bg-black/40 z-40 transition-opacity"
+                className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-all duration-300"
                 onClick={() => setIsFilterOpen(false)}
               />
             )}
 
             {/* Filter Drawer */}
-            <div className={`fixed top-0 right-0 h-full w-[85%] sm:w-[400px] bg-white z-50 shadow-2xl transform transition-transform duration-300 ease-in-out flex flex-col ${isFilterOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-              <div className="p-6 overflow-y-auto flex-grow flex flex-col gap-8">
-                <div className="flex justify-between items-start mb-2">
-                  <h2 className="text-[#e02b27] text-3xl font-black italic uppercase m-0 tracking-tight leading-none max-w-[80%]">Lọc theo thông số xe</h2>
-                  <button onClick={() => setIsFilterOpen(false)} className="text-gray-400 hover:text-[#e02b27] transition-colors mt-1">
-                    <span className="material-symbols-outlined text-[28px]">close</span>
+            <div className={`fixed top-0 right-0 h-full w-[90%] sm:w-[450px] bg-white z-50 shadow-2xl transform transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] flex flex-col ${isFilterOpen ? 'translate-x-0' : 'translate-x-full'} rounded-l-3xl`}>
+              <div className="p-8 overflow-y-auto flex-grow flex flex-col gap-10">
+                <div className="flex justify-between items-center mb-2">
+                  <h2 className="text-primary text-3xl font-heading font-black uppercase tracking-tight leading-none m-0">Bộ lọc thông số</h2>
+                  <button onClick={() => setIsFilterOpen(false)} className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-red-100 hover:text-red-600 transition-colors">
+                    <span className="material-symbols-outlined text-[24px]">close</span>
                   </button>
                 </div>
 
+                {/* Loại xe */}
                 <div>
-                  <h4 className="text-[#1a1c1b] mb-4 text-[15px] font-medium">Loại xe</h4>
+                  <h4 className="font-heading font-bold text-gray-400 uppercase tracking-widest text-xs mb-4">Loại xe</h4>
                   <div className="flex flex-wrap gap-2">
                     {categories.map(cat => {
                       const isSelected = selectedCategoryIds.includes(cat.categoryId.toString());
@@ -285,18 +294,19 @@ const FilterPage: React.FC = () => {
                         <button 
                           key={cat.categoryId}
                           onClick={() => handleCategoryChange(cat.categoryId.toString())}
-                          className={`px-4 py-2 font-bold flex items-center gap-2 transition-colors ${isSelected ? 'bg-[#333] text-white' : 'bg-gray-100 text-[#1a1c1b] hover:bg-[#333] hover:text-white'}`}
+                          className={`px-5 py-2.5 rounded-full font-bold text-sm flex items-center gap-2 transition-all duration-300 ${isSelected ? 'bg-gray-900 text-white shadow-md scale-105' : 'bg-gray-100 text-[#1a1c1b] hover:bg-gray-200'}`}
                         >
                           {cat.name}
-                          {isSelected && <span className="material-symbols-outlined text-[16px] font-bold">check</span>}
+                          {isSelected && <span className="material-symbols-outlined text-[16px] font-black">check</span>}
                         </button>
                       );
                     })}
                   </div>
                 </div>
 
+                {/* Hãng xe */}
                 <div>
-                  <h4 className="text-[#1a1c1b] mb-4 text-[15px] font-medium">Hãng xe</h4>
+                  <h4 className="font-heading font-bold text-gray-400 uppercase tracking-widest text-xs mb-4">Thương hiệu</h4>
                   <div className="flex flex-wrap gap-2">
                     {brands.map(brand => {
                       const isSelected = selectedBrandIds.includes(brand.brandId.toString());
@@ -304,23 +314,24 @@ const FilterPage: React.FC = () => {
                         <button 
                           key={brand.brandId}
                           onClick={() => handleBrandChange(brand.brandId.toString())}
-                          className={`px-4 py-2 font-bold flex items-center gap-2 transition-colors ${isSelected ? 'bg-[#333] text-white' : 'bg-gray-100 text-[#1a1c1b] hover:bg-[#333] hover:text-white'}`}
+                          className={`px-5 py-2.5 rounded-full font-bold text-sm flex items-center gap-2 transition-all duration-300 ${isSelected ? 'bg-gray-900 text-white shadow-md scale-105' : 'bg-gray-100 text-[#1a1c1b] hover:bg-gray-200'}`}
                         >
                           {brand.name}
-                          {isSelected && <span className="material-symbols-outlined text-[16px] font-bold">check</span>}
+                          {isSelected && <span className="material-symbols-outlined text-[16px] font-black">check</span>}
                         </button>
                       );
                     })}
                   </div>
                 </div>
 
+                {/* Mức giá */}
                 <div>
-                  <h4 className="text-[#1a1c1b] mb-4 text-[15px] font-medium">Mức giá</h4>
+                  <h4 className="font-heading font-bold text-gray-400 uppercase tracking-widest text-xs mb-4">Mức giá</h4>
                   
                   {/* Dual Slider Visual */}
-                  <div className="relative w-full h-1 bg-gray-200 rounded my-8 flex items-center">
+                  <div className="relative w-full h-1.5 bg-gray-200 rounded-full my-10 flex items-center">
                     <div 
-                      className="absolute h-full bg-[#e02b27] rounded"
+                      className="absolute h-full bg-primary rounded-full shadow-[0_0_10px_rgba(166,59,0,0.5)]"
                       style={{ 
                         left: `${((minPrice === '' ? MIN_PRICE_LIMIT : Math.min(minPrice, MAX_PRICE_LIMIT)) / MAX_PRICE_LIMIT) * 100}%`,
                         right: `${100 - ((maxPrice === '' ? MAX_PRICE_LIMIT : Math.min(maxPrice, MAX_PRICE_LIMIT)) / MAX_PRICE_LIMIT) * 100}%` 
@@ -337,7 +348,7 @@ const FilterPage: React.FC = () => {
                         const val = Math.min(Number(e.target.value), sMax - 1000000);
                         setMinPrice(val);
                       }}
-                      className="absolute w-full appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-[1.5px] [&::-webkit-slider-thumb]:border-gray-300 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-md cursor-pointer"
+                      className="absolute w-full appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-7 [&::-webkit-slider-thumb]:h-7 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:border-primary [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-lg cursor-pointer"
                       style={{ zIndex: (minPrice === '' ? MIN_PRICE_LIMIT : minPrice) > MAX_PRICE_LIMIT - 1000000 ? 3 : 4 }}
                     />
                     <input 
@@ -351,31 +362,37 @@ const FilterPage: React.FC = () => {
                         const val = Math.max(Number(e.target.value), sMin + 1000000);
                         setMaxPrice(val);
                       }}
-                      className="absolute w-full appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-[1.5px] [&::-webkit-slider-thumb]:border-gray-300 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-md cursor-pointer"
+                      className="absolute w-full appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-7 [&::-webkit-slider-thumb]:h-7 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:border-primary [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-lg cursor-pointer"
                       style={{ zIndex: 4 }}
                     />
                   </div>
 
                   <div className="flex items-center gap-4">
-                    <input 
-                      type="text"
-                      placeholder="0"
-                      value={formatPrice(minPrice)}
-                      onChange={handleMinPriceChange}
-                      className="w-full border border-gray-300 rounded py-2 px-3 text-center font-bold focus:outline-none focus:border-[#e02b27]"
-                    />
-                    <span className="text-gray-400 font-bold">-</span>
-                    <input 
-                      type="text"
-                      placeholder="2.000.000.000"
-                      value={formatPrice(maxPrice)}
-                      onChange={handleMaxPriceChange}
-                      className="w-full border border-gray-300 rounded py-2 px-3 text-center font-bold focus:outline-none focus:border-[#e02b27]"
-                    />
+                    <div className="relative w-full">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-xs">Từ</span>
+                      <input 
+                        type="text"
+                        placeholder="0"
+                        value={formatPrice(minPrice)}
+                        onChange={handleMinPriceChange}
+                        className="w-full border-2 border-gray-200 rounded-xl py-3 pl-10 pr-3 text-right font-heading font-bold text-lg focus:outline-none focus:border-primary transition-colors text-gray-700"
+                      />
+                    </div>
+                    <span className="text-gray-300 font-black">-</span>
+                    <div className="relative w-full">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-xs">Đến</span>
+                      <input 
+                        type="text"
+                        placeholder="2.000.000.000"
+                        value={formatPrice(maxPrice)}
+                        onChange={handleMaxPriceChange}
+                        className="w-full border-2 border-gray-200 rounded-xl py-3 pl-12 pr-3 text-right font-heading font-bold text-lg focus:outline-none focus:border-primary transition-colors text-gray-700"
+                      />
+                    </div>
                   </div>
                 </div>
 
-                <div className="mt-auto pt-4">
+                <div className="mt-auto pt-8">
                   <button 
                     type="button" 
                     onClick={() => {
@@ -383,19 +400,19 @@ const FilterPage: React.FC = () => {
                       setMaxPrice('');
                       resetFilters();
                     }} 
-                    className="w-full py-3 mb-2 rounded border border-gray-300 bg-white text-[#1a1c1b] font-bold hover:bg-gray-50 transition-colors"
+                    className="w-full py-4 mb-2 rounded-xl border-2 border-gray-200 bg-white text-gray-600 font-heading font-bold tracking-widest text-sm hover:bg-gray-50 hover:border-gray-300 transition-all uppercase shadow-sm"
                   >
-                    LÀM MỚI BỘ LỌC
+                    Làm mới bộ lọc
                   </button>
                 </div>
               </div>
 
-              <div className="p-4 border-t border-gray-100 flex justify-end">
+              <div className="p-6 border-t border-gray-100 bg-gray-50 rounded-bl-3xl">
                 <button 
                   onClick={validateAndApplyPrice}
-                  className="flex items-center gap-2 border-[1.5px] border-[#e02b27] text-[#e02b27] px-8 py-2.5 font-bold hover:bg-[#e02b27] hover:text-white transition-colors uppercase"
+                  className="w-full flex justify-center items-center gap-2 bg-primary text-white px-8 py-4 rounded-xl font-heading font-bold tracking-widest text-sm hover:bg-primary-hover hover:shadow-[0_8px_20px_rgba(166,59,0,0.3)] transition-all uppercase hover:-translate-y-1"
                 >
-                  Lọc <span className="material-symbols-outlined font-bold text-[20px]">arrow_forward</span>
+                  Áp dụng bộ lọc <span className="material-symbols-outlined font-bold text-[20px]">check</span>
                 </button>
               </div>
             </div>
@@ -404,17 +421,32 @@ const FilterPage: React.FC = () => {
             <section className="w-full flex flex-col mt-2">
 
               {loading ? (
-                <div className="flex justify-center py-12 md:py-20">
-                  <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-[#a63b00]"></div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 py-4">
+                  {[...Array(8)].map((_, i) => (
+                    <div key={i} className="h-[400px] bg-white rounded-3xl p-4 flex flex-col gap-4 border border-gray-100 shadow-sm">
+                      <Skeleton className="w-full h-[200px] rounded-2xl" />
+                      <div className="flex justify-between">
+                        <Skeleton className="w-16 h-5 rounded" />
+                        <Skeleton className="w-16 h-5 rounded" />
+                      </div>
+                      <Skeleton className="w-3/4 h-6 rounded" />
+                      <Skeleton className="w-full h-12 rounded mt-2" />
+                      <div className="flex justify-between items-end mt-auto">
+                        <Skeleton className="w-24 h-8 rounded" />
+                        <Skeleton className="w-10 h-10 rounded-full" />
+                      </div>
+                    </div>
+                  ))}
                 </div>
               ) : products.length === 0 ? (
-                <div className="py-12 md:py-20 text-center flex flex-col items-center justify-center text-[#594138]">
-                  <span className="material-symbols-outlined text-6xl mb-4 text-gray-300">
+                <div className="py-20 text-center flex flex-col items-center justify-center text-[#594138] bg-white rounded-3xl border border-gray-100 shadow-sm mt-4">
+                  <span className="material-symbols-outlined text-7xl mb-4 text-gray-200">
                     inventory_2
                   </span>
-                  <p className="font-bold text-[#1a1c1b] text-lg">
-                    Không tìm thấy sản phẩm nào phù hợp với bộ lọc
+                  <p className="font-heading font-bold text-[#1a1c1b] text-2xl uppercase">
+                    Không tìm thấy sản phẩm
                   </p>
+                  <p className="text-gray-500 mt-2 text-base">Vui lòng thử thay đổi bộ lọc hoặc từ khóa tìm kiếm.</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -427,58 +459,59 @@ const FilterPage: React.FC = () => {
                     const displayImage = firstColorImage || (product.imageUrls && product.imageUrls.length > 0 ? product.imageUrls[0] : "https://via.placeholder.com/300");
 
                     return (
-                      <div key={product.productId} className="h-full bg-white border border-gray-100 shadow-sm rounded-2xl overflow-hidden relative flex flex-col transition-all hover:shadow-lg hover:-translate-y-1 group">
+                      <Link to={`/product/${product.productId}`} key={product.productId} className="h-full bg-white border border-gray-100 shadow-sm rounded-3xl overflow-hidden relative flex flex-col transition-all duration-300 hover:shadow-xl hover:-translate-y-2 hover:border-primary/30 group">
                         {product.appliedPromotion && (
-                          <div className="absolute top-4 right-4 z-10 bg-red-600 text-white shadow-sm px-3 py-1.5 rounded-xl font-bold text-[10px] uppercase tracking-wide">
+                          <div className="absolute top-4 right-4 z-10 bg-gradient-to-r from-red-600 to-primary text-white shadow-md px-3 py-1.5 rounded-full font-heading font-bold text-[10px] uppercase tracking-widest">
                             {product.appliedPromotion.promotionName}
                           </div>
                         )}
-                        <div className="h-[220px] overflow-hidden p-4 bg-gray-50 flex items-center justify-center">
+                        <div className="h-[220px] overflow-hidden p-6 bg-gradient-to-b from-gray-50 to-white flex items-center justify-center relative">
+                          <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                           <img loading="lazy" decoding="async" 
                             src={displayImage} 
                             alt={product.name} 
-                            className="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-300" 
+                            className="w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-500 relative z-10" 
                           />
                         </div>
                         <div className="flex flex-col p-6 flex-grow">
-                          <div className="flex justify-between items-center mb-3">
-                            <span className="bg-gray-100 text-[#594138] border border-gray-200 font-bold uppercase px-2 py-1 rounded text-[10px]">
+                          <div className="flex justify-between items-center mb-4">
+                            <span className="bg-gray-100 text-[#594138] border border-gray-200 font-bold uppercase px-2.5 py-1 rounded-md text-[10px] tracking-wider">
                               {categories.find(c => c.categoryId === product.categoryId)?.name || 'Category'}
                             </span>
-                            <span className="text-gray-400 font-bold uppercase text-[10px] tracking-wider">
+                            <span className="text-gray-400 font-bold uppercase text-[10px] tracking-widest">
                               {brands.find(b => b.brandId === product.brandId)?.name || 'Brand'}
                             </span>
                           </div>
-                          <h5 className="font-extrabold text-lg text-[#1a1c1b] mb-2 leading-tight">
+                          <h5 className="font-heading font-black text-xl text-[#1a1c1b] mb-2 leading-tight uppercase line-clamp-2">
                             {product.name}
                           </h5>
-                          <p className="text-[#594138] mb-6 flex-grow text-sm leading-relaxed line-clamp-2">
-                            {product.description}
+                          <p className="text-gray-500 mb-6 flex-grow text-sm leading-relaxed line-clamp-2">
+                            {product.description || "Không có mô tả chi tiết."}
                           </p>
-                          <div className="flex justify-between items-end mt-auto pt-4 border-t border-gray-100">
+                          <div className="flex justify-between items-end mt-auto pt-5 border-t border-gray-100">
                             <div>
-                              <span className="block text-gray-400 uppercase font-bold mb-1 text-[10px] tracking-wider">Giá bán</span>
+                              <span className="block text-gray-400 uppercase font-heading font-bold mb-1 text-[10px] tracking-widest">Giá bán</span>
                               {product.appliedPromotion ? (
                                 <div>
-                                  <span className="text-[#594138] line-through block text-xs mb-0.5">
+                                  <span className="text-gray-400 line-through block text-xs mb-0.5">
                                     {product.basePrice.toLocaleString('vi-VN')} ₫
                                   </span>
-                                  <span className="font-bold text-xl text-[#a63b00]">
+                                  <span className="font-heading font-black text-2xl text-primary drop-shadow-sm">
                                     {discountedPrice.toLocaleString('vi-VN')} ₫
                                   </span>
                                 </div>
                               ) : (
-                                <span className="font-bold text-xl text-[#1a1c1b]">
+                                <span className="font-heading font-black text-2xl text-[#1a1c1b]">
                                   {product.basePrice.toLocaleString('vi-VN')} ₫
                                 </span>
                               )}
                             </div>
-                            <Link to={`/product/${product.productId}`} className="bg-gray-900 hover:bg-[#a63b00] text-white rounded-full w-10 h-10 flex items-center justify-center shadow-sm transition-colors">
-                              <span className="material-symbols-outlined text-xl">arrow_forward</span>
-                            </Link>
+                            <div className="bg-gray-100 group-hover:bg-primary text-gray-400 group-hover:text-white rounded-full w-12 h-12 flex items-center justify-center shadow-sm transition-all duration-300">
+                              <span className="material-symbols-outlined text-2xl group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                            </div>
                           </div>
                         </div>
-                      </div>
+                      </Link>
                     );
                   })}
                 </div>
@@ -486,41 +519,41 @@ const FilterPage: React.FC = () => {
 
               {/* Pagination Controls */}
               {pagination.totalPages > 1 && (
-                <div className="mt-12 flex flex-col sm:flex-row items-center justify-between border-t border-gray-200 pt-6 gap-4">
-                  <div className="flex items-center gap-2 text-sm text-[#594138] font-medium">
+                <div className="mt-16 flex flex-col sm:flex-row items-center justify-between border-t border-gray-200 pt-8 gap-6">
+                  <div className="flex items-center gap-3 text-sm text-[#594138] font-medium bg-white px-4 py-2 rounded-full border border-gray-200 shadow-sm">
                     <span>Hiển thị</span>
                     <select 
                       value={pageSizeParam}
                       onChange={(e) => handlePageSizeChange(Number(e.target.value))}
-                      className="border border-gray-300 rounded px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-[#a63b00] font-bold text-[#1a1c1b] cursor-pointer"
+                      className="bg-transparent font-heading font-bold text-lg text-primary focus:outline-none cursor-pointer"
                     >
                       <option value={8}>8</option>
                       <option value={12}>12</option>
                       <option value={24}>24</option>
                       <option value={48}>48</option>
                     </select>
-                    <span>sản phẩm mỗi trang</span>
+                    <span>/ trang</span>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 bg-white p-1 rounded-full border border-gray-200 shadow-sm">
                     <button 
                       onClick={() => handlePageChange(pagination.currentPage - 1)}
                       disabled={pagination.currentPage <= 1}
-                      className="px-4 py-2 border border-gray-300 rounded-xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed font-bold text-sm transition-colors text-[#1a1c1b]"
+                      className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 disabled:opacity-30 disabled:hover:bg-transparent transition-colors text-gray-700"
                     >
-                      Trước
+                      <span className="material-symbols-outlined">chevron_left</span>
                     </button>
                     
-                    <span className="text-sm font-bold text-[#1a1c1b] px-4">
-                      Trang {pagination.currentPage} / {pagination.totalPages}
+                    <span className="text-sm font-heading font-bold text-[#1a1c1b] px-4 tracking-widest uppercase">
+                      <span className="text-primary">{pagination.currentPage}</span> / {pagination.totalPages}
                     </span>
 
                     <button 
                       onClick={() => handlePageChange(pagination.currentPage + 1)}
                       disabled={pagination.currentPage >= pagination.totalPages}
-                      className="px-4 py-2 border border-gray-300 rounded-xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed font-bold text-sm transition-colors text-[#1a1c1b]"
+                      className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 disabled:opacity-30 disabled:hover:bg-transparent transition-colors text-gray-700"
                     >
-                      Tiếp
+                      <span className="material-symbols-outlined">chevron_right</span>
                     </button>
                   </div>
                 </div>

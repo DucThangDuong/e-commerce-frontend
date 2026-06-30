@@ -160,38 +160,55 @@ const CartPage: React.FC = () => {
 
   if (!isLogin) {
     return (
-      <div className="pt-[56px] min-h-screen bg-gray-50 flex flex-col items-center justify-center font-sans">
-        <span className="material-symbols-outlined text-6xl text-gray-300 mb-4">shopping_cart</span>
-        <h2 className="text-2xl font-bold tracking-tight text-[#1a1c1b] mb-2">Vui lòng đăng nhập</h2>
-        <p className="text-[#594138] mb-6">Bạn cần đăng nhập để xem giỏ hàng của mình</p>
-        <Link to="/login" className="bg-[#a63b00] hover:bg-[#8a3100] text-white px-8 py-3 rounded-xl font-bold shadow-sm transition-colors">
-          Đăng nhập ngay
-        </Link>
+      <div className="pt-[80px] min-h-screen bg-[#f9f9f7] flex flex-col items-center justify-center font-sans relative overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="bg-white p-12 rounded-[2rem] shadow-xl border border-gray-100 flex flex-col items-center text-center relative z-10 max-w-md mx-4 animate-scale-in">
+          <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mb-6 relative border-4 border-white shadow-md">
+            <span className="material-symbols-outlined text-5xl text-gray-400 drop-shadow-sm">login</span>
+          </div>
+          <h2 className="text-3xl font-heading font-black tracking-tight text-[#1a1c1b] mb-3 uppercase">Vui lòng đăng nhập</h2>
+          <p className="text-gray-500 mb-8 leading-relaxed text-sm">Bạn cần đăng nhập để xem và quản lý giỏ hàng của mình.</p>
+          <Link to="/login" className="w-full bg-primary hover:bg-primary-hover text-white px-8 py-4 rounded-xl font-heading font-bold shadow-lg shadow-primary/30 transition-all uppercase tracking-widest text-sm hover:-translate-y-1 hover:shadow-xl">
+            Đăng nhập ngay
+          </Link>
+        </div>
       </div>
     );
   }
 
   if (loading) {
     return (
-      <div className="pt-[56px] min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-[#a63b00]"></div>
+      <div className="pt-[80px] min-h-screen bg-[#f9f9f7] flex items-center justify-center">
+        <div className="relative w-20 h-20">
+          <div className="absolute inset-0 border-4 border-primary/20 rounded-full"></div>
+          <div className="absolute inset-0 border-4 border-primary rounded-full border-t-transparent animate-spin"></div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="pt-[56px] bg-gray-50 font-sans text-[#1a1c1b] min-h-screen flex flex-col">
-      <main className="flex-grow container mx-auto px-4 py-8 md:py-12 max-w-7xl">
-        <h1 className="text-2xl md:text-3xl font-bold text-[#1a1c1b] mb-6 md:mb-10 tracking-tight">
-          Giỏ hàng của bạn
-        </h1>
+    <div className="pt-[80px] bg-[#f9f9f7] font-sans text-[#1a1c1b] min-h-screen flex flex-col pb-20 relative">
+      <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-gray-200/50 to-transparent pointer-events-none"></div>
+      <main className="flex-grow container mx-auto px-4 py-8 md:py-12 max-w-7xl relative z-10">
+        <div className="flex items-center gap-4 mb-8 md:mb-12">
+          <span className="w-14 h-14 rounded-full bg-primary/10 text-primary flex items-center justify-center shadow-sm">
+            <span className="material-symbols-outlined text-[28px]">shopping_cart</span>
+          </span>
+          <h1 className="text-3xl md:text-5xl font-heading font-black text-[#1a1c1b] tracking-tight uppercase">
+            Giỏ hàng
+          </h1>
+        </div>
 
         {cartItems.length === 0 ? (
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 flex flex-col items-center justify-center">
-            <span className="material-symbols-outlined text-6xl text-gray-300 mb-4">remove_shopping_cart</span>
-            <h2 className="text-xl font-bold tracking-tight text-[#1a1c1b] mb-2">Giỏ hàng trống</h2>
-            <p className="text-[#594138] mb-8">Hãy tìm thêm các sản phẩm tuyệt vời nhé!</p>
-            <Link to="/categories" className="bg-gray-900 hover:bg-gray-800 text-white px-8 py-3 rounded-xl font-bold shadow-sm transition-colors">
+          <div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-16 flex flex-col items-center justify-center text-center animate-fade-in relative overflow-hidden">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gray-50 rounded-full blur-3xl pointer-events-none"></div>
+            <div className="w-32 h-32 bg-gray-50 rounded-full flex items-center justify-center mb-8 relative border-4 border-white shadow-xl z-10">
+              <span className="material-symbols-outlined text-[64px] text-gray-300 drop-shadow-sm">remove_shopping_cart</span>
+            </div>
+            <h2 className="text-3xl font-heading font-black tracking-tight text-[#1a1c1b] mb-4 uppercase relative z-10">Giỏ hàng trống</h2>
+            <p className="text-gray-500 mb-10 text-sm max-w-md leading-relaxed relative z-10">Garage của bạn chưa có chiếc xe nào. Hãy khám phá ngay những mẫu xe đỉnh cao của chúng tôi!</p>
+            <Link to="/categories" className="bg-gray-900 hover:bg-black text-white px-10 py-4 rounded-full font-heading font-bold shadow-lg transition-all uppercase tracking-widest text-sm hover:-translate-y-1 hover:shadow-xl relative z-10">
               Tiếp tục mua sắm
             </Link>
           </div>
@@ -200,7 +217,11 @@ const CartPage: React.FC = () => {
             
             {/* Cart Items List */}
             <section className="w-full lg:w-2/3">
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+              <div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
+                <div className="p-6 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
+                  <span className="font-heading font-bold uppercase tracking-widest text-gray-500 text-sm">Sản phẩm ({cartItems.length})</span>
+                  <span className="font-heading font-bold uppercase tracking-widest text-gray-500 text-sm hidden sm:block">Tạm tính</span>
+                </div>
                 <ul className="divide-y divide-gray-100">
                   {cartItems.map((cart) => {
                     const price = getSingleItemPrice(cart);
@@ -210,111 +231,119 @@ const CartPage: React.FC = () => {
                                   : "https://via.placeholder.com/150";
 
                     return (
-                      <li key={cart.cartId} className="flex flex-col hover:bg-gray-50 transition-colors">
-                        <div className="p-4 sm:p-6 flex items-center">
-                        {/* Checkbox */}
-                        <div className="pr-4">
-                          <input 
-                            type="checkbox" 
-                            checked={isSelected}
-                            onChange={() => toggleSelect(cart.cartId)}
-                            className="w-5 h-5 text-[#a63b00] rounded border-gray-300 focus:ring-[#a63b00] cursor-pointer"
-                          />
-                        </div>
-
-                        {/* Image */}
-                        <div className="flex-shrink-0">
-                          <img loading="lazy" decoding="async" src={imgUrl} alt={cart.name} className="w-20 h-20 sm:w-24 sm:h-24 rounded-lg border border-gray-200 object-cover" />
-                        </div>
-
-                        {/* Details */}
-                        <div className="ml-4 sm:ml-6 flex-grow flex flex-col sm:flex-row sm:items-center gap-4">
-                          <div className="flex-grow min-w-0">
-                            <Link to={`/product/${cart.productId}`} className="text-[#1a1c1b] font-bold hover:text-[#a63b00] transition-colors line-clamp-2 leading-snug">
-                              {cart.name}
-                            </Link>
-                            <div className="mt-1 flex items-center text-sm text-[#594138]">
-                              <span>Phân loại: <span className="font-medium text-[#1a1c1b]">{cart.colorName}</span></span>
+                      <li key={cart.cartId} className="flex flex-col hover:bg-gray-50/50 transition-colors group">
+                        <div className="p-4 sm:p-5 flex items-center gap-3 sm:gap-4">
+                          {/* Checkbox */}
+                          <div className="shrink-0 flex items-center justify-center">
+                            <div className="relative flex items-center justify-center">
+                              <input 
+                                type="checkbox" 
+                                checked={isSelected}
+                                onChange={() => toggleSelect(cart.cartId)}
+                                className="peer appearance-none w-5 h-5 border-2 border-gray-300 rounded-md checked:bg-primary checked:border-primary cursor-pointer transition-all hover:border-primary/50"
+                              />
+                              <span className="material-symbols-outlined text-white text-[14px] absolute pointer-events-none opacity-0 peer-checked:opacity-100 font-black">done</span>
                             </div>
-                            <div className="mt-1 sm:hidden flex flex-col">
-                              {cart.appliedPromotion && (
-                                <span className="text-[#594138] line-through text-xs">{cart.basePrice.toLocaleString('vi-VN')} ₫</span>
+                          </div>
+
+                          {/* Image */}
+                          <div className="shrink-0 w-20 h-20 sm:w-24 sm:h-24 bg-gray-100 rounded-2xl flex items-center justify-center p-2 group-hover:bg-gray-200 transition-colors relative overflow-hidden">
+                            <img loading="lazy" decoding="async" src={imgUrl} alt={cart.name} className="w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-500" />
+                          </div>
+
+                          {/* Details */}
+                          <div className="flex-grow flex flex-col sm:flex-row gap-3 min-w-0">
+                            <div className="flex-grow min-w-0 flex flex-col justify-center">
+                              <Link to={`/product/${cart.productId}`} className="font-heading font-black text-lg md:text-xl text-[#1a1c1b] hover:text-primary transition-colors line-clamp-2 leading-tight uppercase tracking-tight mb-1.5">
+                                {cart.name}
+                              </Link>
+                              <div className="flex items-center gap-2">
+                                <span className="bg-gray-100 text-gray-700 px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider border border-gray-200">
+                                  {cart.colorName}
+                                </span>
+                              </div>
+                              <div className="mt-2 sm:hidden flex flex-col">
+                                {cart.appliedPromotion && (
+                                  <span className="text-gray-400 line-through text-[10px] font-bold">{cart.basePrice.toLocaleString('vi-VN')} ₫</span>
+                                )}
+                                <p className="font-bold text-primary text-base">{price.toLocaleString('vi-VN')} ₫</p>
+                              </div>
+                            </div>
+
+                            <div className="hidden sm:flex flex-col justify-center text-right shrink-0 w-36">
+                              {cart.appliedPromotion ? (
+                                <>
+                                  <span className="text-gray-400 line-through text-xs font-bold">{cart.basePrice.toLocaleString('vi-VN')} ₫</span>
+                                  <p className="font-black text-primary text-lg tracking-tight whitespace-nowrap">{price.toLocaleString('vi-VN')} ₫</p>
+                                  <span className="text-[10px] uppercase font-black text-white bg-red-500 px-2 py-0.5 rounded-md self-end mt-1 tracking-widest shadow-sm">{cart.appliedPromotion.promotionName}</span>
+                                </>
+                              ) : (
+                                <p className="font-black text-[#1a1c1b] text-lg tracking-tight whitespace-nowrap">{price.toLocaleString('vi-VN')} ₫</p>
                               )}
-                              <p className="font-bold text-[#a63b00]">{price.toLocaleString('vi-VN')} ₫</p>
                             </div>
-                          </div>
 
-                          <div className="hidden sm:flex flex-col text-right flex-shrink-0 w-36">
-                            {cart.appliedPromotion ? (
-                              <>
-                                <span className="text-[#594138] line-through text-sm">{cart.basePrice.toLocaleString('vi-VN')} ₫</span>
-                                <p className="m-0 font-bold text-[#a63b00]">{price.toLocaleString('vi-VN')} ₫</p>
-                                <span className="text-[10px] uppercase font-bold text-white bg-red-600 px-2 py-0.5 rounded-md self-end mt-1">{cart.appliedPromotion.promotionName}</span>
-                              </>
-                            ) : (
-                              <p className="m-0 font-bold text-[#1a1c1b]">{price.toLocaleString('vi-VN')} ₫</p>
-                            )}
-                          </div>
+                            <div className="flex items-center justify-between sm:justify-end shrink-0 w-full sm:w-auto gap-3 mt-3 sm:mt-0">
+                              {/* Quantity */}
+                              <div className="flex items-center border-2 border-gray-100 rounded-xl bg-white h-9 shadow-sm shrink-0">
+                                <button 
+                                  type="button" 
+                                  disabled={cart.quantity <= 1}
+                                  className="w-8 h-full flex items-center justify-center text-gray-500 hover:bg-gray-50 hover:text-primary transition-colors rounded-l-xl font-bold disabled:opacity-30 disabled:cursor-not-allowed"
+                                  onClick={() => updateQty(cart.cartId, -1)}
+                                >
+                                  <span className="material-symbols-outlined text-[16px]">remove</span>
+                                </button>
+                                <span className="w-8 text-center font-heading font-black text-[#1a1c1b] border-x-2 border-gray-100 h-full flex items-center justify-center text-sm">
+                                  {cart.quantity}
+                                </span>
+                                <button 
+                                  type="button" 
+                                  disabled={cart.quantity >= cart.stockQuantity}
+                                  className="w-8 h-full flex items-center justify-center text-gray-500 hover:bg-gray-50 hover:text-primary transition-colors rounded-r-xl font-bold disabled:opacity-30 disabled:cursor-not-allowed"
+                                  onClick={() => updateQty(cart.cartId, 1)}
+                                >
+                                  <span className="material-symbols-outlined text-[16px]">add</span>
+                                </button>
+                              </div>
 
-                          <div className="flex items-center justify-between sm:justify-end flex-shrink-0 w-full sm:w-auto gap-4 mt-2 sm:mt-0">
-                            {/* Quantity */}
-                            <div className="flex items-center border border-gray-300 rounded-xl bg-white h-10">
+                              {/* Total price for this item (mobile hidden) */}
+                              <div className="hidden lg:flex flex-col justify-center text-right w-36 shrink-0">
+                                <span className="text-[9px] font-heading font-bold text-gray-400 uppercase tracking-widest mb-0.5">Tổng cộng</span>
+                                <span className="font-black text-primary text-lg tracking-tight whitespace-nowrap">{(price * cart.quantity).toLocaleString('vi-VN')} ₫</span>
+                              </div>
+
+                              {/* Delete */}
                               <button 
                                 type="button" 
-                                className="w-10 h-full flex items-center justify-center text-[#594138] hover:bg-gray-50 hover:text-[#1a1c1b] transition-colors rounded-l-lg"
-                                onClick={() => updateQty(cart.cartId, -1)}
+                                onClick={() => removeCartItem(cart.cartId)}
+                                className="w-9 h-9 flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all border-2 border-transparent hover:border-red-100 bg-white shrink-0"
+                                title="Xóa"
                               >
-                                <span className="material-symbols-outlined text-[18px]">remove</span>
-                              </button>
-                              <span className="w-10 text-center font-bold text-[#1a1c1b] border-x border-gray-300 h-full flex items-center justify-center text-sm">
-                                {cart.quantity}
-                              </span>
-                              <button 
-                                type="button" 
-                                className="w-10 h-full flex items-center justify-center text-[#594138] hover:bg-gray-50 hover:text-[#1a1c1b] transition-colors rounded-r-lg"
-                                onClick={() => updateQty(cart.cartId, 1)}
-                              >
-                                <span className="material-symbols-outlined text-[18px]">add</span>
+                                <span className="material-symbols-outlined text-[18px]">delete</span>
                               </button>
                             </div>
-
-                            {/* Total price for this item (mobile hidden) */}
-                            <div className="hidden lg:block text-right font-bold text-[#a63b00] w-32 flex-shrink-0">
-                              {(price * cart.quantity).toLocaleString('vi-VN')} VNĐ
-                            </div>
-
-                            {/* Delete */}
-                            <button 
-                              type="button" 
-                              onClick={() => removeCartItem(cart.cartId)}
-                              className="w-10 h-10 flex items-center justify-center text-red-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-all"
-                              title="Xóa"
-                            >
-                              <span className="material-symbols-outlined">delete</span>
-                            </button>
-                          </div>
                           </div>
                         </div>
 
                         {/* Confirmation Row Below Product */}
                         {confirmDeleteId === cart.cartId && (
-                          <div className="bg-red-50/80 border-t border-red-100 px-4 py-3 sm:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-fade-in-down">
-                            <span className="text-red-600 font-medium text-sm flex items-center gap-2">
-                              <span className="material-symbols-outlined text-lg">warning</span>
-                              Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?
+                          <div className="bg-red-50/80 border-t border-red-100 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-fade-in-down overflow-hidden">
+                            <span className="text-red-600 font-bold text-sm flex items-center gap-2 uppercase tracking-wider">
+                              <span className="material-symbols-outlined text-xl">warning</span>
+                              Xóa sản phẩm này khỏi giỏ hàng?
                             </span>
                             <div className="flex items-center gap-3 self-end sm:self-auto">
                               <button 
                                 type="button" 
                                 onClick={() => setConfirmDeleteId(null)} 
-                                className="px-4 py-1.5 text-sm rounded-lg bg-white border border-gray-300 text-[#1a1c1b] font-bold hover:bg-gray-100 transition-colors"
+                                className="px-5 py-2.5 text-sm rounded-xl bg-white border-2 border-red-100 text-red-600 font-bold hover:bg-red-50 transition-colors uppercase tracking-widest"
                               >
                                 Hủy
                               </button>
                               <button 
                                 type="button" 
                                 onClick={() => removeCartItem(cart.cartId)} 
-                                className="px-4 py-1.5 text-sm rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold shadow-sm transition-colors"
+                                className="px-5 py-2.5 text-sm rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold shadow-md transition-colors uppercase tracking-widest"
                               >
                                 Xác nhận
                               </button>
@@ -330,23 +359,29 @@ const CartPage: React.FC = () => {
 
             {/* Summary Panel */}
             <section className="w-full lg:w-1/3">
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sticky top-24">
-                <h2 className="text-xl font-bold tracking-tight text-[#1a1c1b] mb-6">Tổng thanh toán</h2>
+              <div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 sticky top-28 overflow-hidden relative">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
+                <h2 className="text-2xl font-heading font-black tracking-tight text-[#1a1c1b] mb-8 uppercase flex items-center gap-3 border-b border-gray-100 pb-6 relative z-10">
+                  <span className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+                    <span className="material-symbols-outlined text-[20px]">receipt_long</span>
+                  </span>
+                  Tổng thanh toán
+                </h2>
 
-                <div className="flex flex-col gap-4 mb-6">
-                  <div className="flex justify-between items-center text-[#594138]">
-                    <span>Số lượng (<span className="font-bold text-[#1a1c1b]">{getSelectedItemCount()}</span>)</span>
-                    <span className="font-bold text-[#1a1c1b]">{subtotal.toLocaleString('vi-VN')} VNĐ</span>
+                <div className="flex flex-col gap-5 mb-8 relative z-10">
+                  <div className="flex justify-between items-center text-gray-500">
+                    <span className="font-bold text-sm uppercase tracking-wider">Số lượng (<span className="text-[#1a1c1b]">{getSelectedItemCount()}</span>)</span>
+                    <span className="font-black text-[#1a1c1b] text-lg">{subtotal.toLocaleString('vi-VN')} ₫</span>
                   </div>
                   
-                  <div className="flex justify-between items-center text-[#594138] pt-4 border-t border-gray-100">
-                    <span>Tiền ship</span>
-                    <span className="font-bold text-[#1a1c1b]">{shippingFee.toLocaleString('vi-VN')} VNĐ</span>
+                  <div className="flex justify-between items-center text-gray-500 pt-5 border-t border-dashed border-gray-200">
+                    <span className="font-bold text-sm uppercase tracking-wider">Phí vận chuyển</span>
+                    <span className="font-black text-[#1a1c1b] text-lg">{shippingFee.toLocaleString('vi-VN')} ₫</span>
                   </div>
 
-                  <div className="flex justify-between items-center pt-4 border-t border-gray-100">
-                    <span className="text-lg font-bold text-[#1a1c1b]">Tổng cộng</span>
-                    <span className="text-2xl font-bold text-[#a63b00]">{grandTotal.toLocaleString('vi-VN')} VNĐ</span>
+                  <div className="flex justify-between items-center pt-5 border-t-2 border-gray-100 mt-2">
+                    <span className="text-lg font-heading font-black text-[#1a1c1b] uppercase tracking-wide">Tổng cộng</span>
+                    <span className="text-3xl font-heading font-black text-primary tracking-tight">{grandTotal.toLocaleString('vi-VN')} ₫</span>
                   </div>
                 </div>
 
@@ -354,9 +389,10 @@ const CartPage: React.FC = () => {
                   type="button" 
                   onClick={goToCheckout}
                   disabled={subtotal === 0}
-                  className="w-full bg-[#a63b00] hover:bg-[#8a3100] disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 uppercase tracking-wide"
+                  className="w-full bg-gray-900 hover:bg-black disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white font-heading font-bold py-5 rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-3 uppercase tracking-widest text-sm relative z-10 group"
                 >
-                  THANH TOÁN
+                  THANH TOÁN NGAY
+                  <span className="material-symbols-outlined transition-transform group-hover:translate-x-1">arrow_forward</span>
                 </button>
               </div>
             </section>

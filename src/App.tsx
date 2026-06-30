@@ -8,6 +8,8 @@ import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import PurchasePage from "./pages/PurchasePage";
 import ProfilePage from "./pages/ProfilePage";
+import TermsPage from "./pages/TermsPage";
+import PrivacyPage from "./pages/PrivacyPage";
 import MainLayout from "./layouts/MainLayout";
 import {
   BrowserRouter,
@@ -38,7 +40,7 @@ const GuestRoute = () => {
 };
 
 const ScrollToTop = () => {
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
 
   useEffect(() => {
     window.scrollTo({
@@ -46,7 +48,7 @@ const ScrollToTop = () => {
       left: 0,
       behavior: "instant",
     });
-  }, [pathname]);
+  }, [pathname, search]);
 
   return null;
 };
@@ -103,6 +105,10 @@ function App() {
             <Route path="/profile" element={<ProfilePage />} />
           </Route>
         </Route>
+        
+        {/* Standalone Pages without Header/Footer */}
+        <Route path="/terms" element={<TermsPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
       </Routes>
     </BrowserRouter>
   );

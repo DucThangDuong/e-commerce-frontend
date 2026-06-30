@@ -40,6 +40,7 @@ const DetailPage: React.FC = () => {
   // States for reviews
   const [rating, setRating] = useState(5);
   const [reviewContent, setReviewContent] = useState('');
+  const [reviewError, setReviewError] = useState('');
   
   // Custom Toast state
   const [showAddSuccess, setShowAddSuccess] = useState(false);
@@ -226,10 +227,22 @@ const DetailPage: React.FC = () => {
 
   const handleReviewSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setReviewError('');
+    
+    if (!reviewContent.trim()) {
+      setReviewError('Vui lòng nhập nội dung đánh giá!');
+      return;
+    }
+    
+    if (reviewContent.trim().length < 10) {
+      setReviewError('Nội dung đánh giá quá ngắn (tối thiểu 10 ký tự)!');
+      return;
+    }
+
     try {
       await apiClient.postnodata(`/product/${id}/comment`, {
         rating,
-        content: reviewContent
+        content: reviewContent.trim()
       });
       showNotification('Gửi đánh giá thành công! Đang chờ duyệt.', 'success');
       setReviewContent('');
@@ -241,16 +254,33 @@ const DetailPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen pt-[56px] flex justify-center items-center bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-[#a63b00]"></div>
+      <div className="min-h-screen pt-[56px] flex flex-col bg-background-light">
+        <main className="container mx-auto px-4 py-8 md:py-12 max-w-7xl">
+          <div className="flex flex-col lg:flex-row gap-12">
+            <div className="w-full lg:w-2/3">
+              <div className="relative overflow-hidden bg-gray-200 rounded-3xl h-[400px] lg:h-[600px] w-full">
+                <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/50 to-transparent animate-shimmer"></div>
+              </div>
+            </div>
+            <div className="w-full lg:w-1/3 space-y-6 mt-10 lg:mt-0">
+              <div className="relative overflow-hidden bg-gray-200 rounded-xl h-12 w-3/4"><div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/50 to-transparent animate-shimmer"></div></div>
+              <div className="relative overflow-hidden bg-gray-200 rounded-xl h-8 w-1/4"><div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/50 to-transparent animate-shimmer"></div></div>
+              <div className="flex gap-4">
+                <div className="relative overflow-hidden bg-gray-200 rounded-full h-10 w-24"><div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/50 to-transparent animate-shimmer"></div></div>
+                <div className="relative overflow-hidden bg-gray-200 rounded-full h-10 w-24"><div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/50 to-transparent animate-shimmer"></div></div>
+              </div>
+              <div className="relative overflow-hidden bg-gray-200 rounded-xl h-32 w-full mt-10"><div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/50 to-transparent animate-shimmer"></div></div>
+            </div>
+          </div>
+        </main>
       </div>
     );
   }
 
   if (!product) {
     return (
-      <div className="min-h-screen pt-[56px] flex justify-center items-center bg-gray-50">
-        <h2 className="text-2xl font-bold tracking-tight text-[#1a1c1b]">Sản phẩm không tồn tại</h2>
+      <div className="min-h-screen pt-[56px] flex justify-center items-center bg-background-light">
+        <h2 className="text-3xl font-heading font-black tracking-tight text-[#1a1c1b] uppercase">Sản phẩm không tồn tại</h2>
       </div>
     );
   }
@@ -267,62 +297,60 @@ const DetailPage: React.FC = () => {
   const galleryImages: string[] = product.imageUrls ? [...product.imageUrls] : [];
 
   return (
-    <div className="pt-[56px] bg-[#f9f9f7] font-sans text-[#1a1c1b] min-h-screen flex flex-col overflow-x-hidden">
+    <div className="pt-[56px] bg-background-light font-sans text-[#1a1c1b] min-h-screen flex flex-col overflow-x-hidden">
       <div className="flex-grow">
         <main className="container mx-auto px-4 py-8 md:py-12 max-w-7xl">
 
           {/* Top Section */}
-          <div className="flex flex-col lg:flex-row items-start mb-20 pt-4 lg:pt-10 lg:min-h-[620px]">
-            <div className="w-full lg:w-1/3 lg:pl-12 order-2 lg:order-2 mt-10 lg:mt-0 z-10">
-              <h1 className="text-4xl md:text-5xl font-bold text-[#1a1c1b] mb-6 uppercase tracking-wider leading-tight">
+          <div className="flex flex-col lg:flex-row items-center mb-20 pt-4 lg:pt-10 lg:min-h-[620px] gap-10">
+            <div className="w-full lg:w-[40%] lg:pl-12 order-2 lg:order-2 mt-10 lg:mt-0 z-10 animate-fade-in">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-black text-[#1a1c1b] mb-6 uppercase tracking-tight leading-none drop-shadow-sm">
                 {product.name}
               </h1>
-              <h2 className="text-[#a63b00] italic font-bold uppercase mb-8 text-2xl tracking-wider">
-                GIÁ & MÀU SẮC
-              </h2>
               
-              {/* Colors */}
-              <div className="flex flex-wrap gap-6 mb-6 md:mb-10">
-                {product.colors && product.colors.map(color => (
-                  <div 
-                    key={color.colorId}
-                    className="flex flex-col items-center cursor-pointer relative group w-12"
-                    onClick={() => { setSelectedColor(color); setQuantity(1); }}
-                  >
-                    <div className={`mt-2 text-sm text-center transition-colors ${selectedColor?.colorId === color.colorId ? 'text-[#1a1c1b] font-bold' : 'text-[#594138] font-medium group-hover:text-[#1a1c1b]'}`}>
+              {/* Colors (Pills) */}
+              <div className="mb-8">
+                <h2 className="text-[#594138] font-bold uppercase mb-4 text-sm tracking-widest">
+                  Lựa chọn màu sắc
+                </h2>
+                <div className="flex flex-wrap gap-3">
+                  {product.colors && product.colors.map(color => (
+                    <button 
+                      key={color.colorId}
+                      type="button"
+                      className={`px-5 py-2 rounded-full border-2 font-heading tracking-wider uppercase text-sm transition-all duration-300 hover:-translate-y-1 ${selectedColor?.colorId === color.colorId ? 'bg-primary border-primary text-white shadow-[0_4px_15px_rgba(166,59,0,0.4)]' : 'bg-white border-gray-200 text-[#594138] hover:border-primary-light/50 shadow-sm'}`}
+                      onClick={() => { setSelectedColor(color); setQuantity(1); }}
+                    >
                       {color.colorName}
-                    </div>
-                    <div className={`absolute -bottom-2 h-[2px] w-full transition-colors ${selectedColor?.colorId === color.colorId ? 'bg-[#a63b00]' : 'bg-transparent'}`}></div>
-                  </div>
-                ))}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               {/* Price */}
-              <div className="mb-8 mt-10">
+              <div className="mb-10 bg-white p-6 rounded-3xl shadow-sm border border-gray-100 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-2xl -mr-10 -mt-10"></div>
                 <p className="text-[#594138] mb-2 font-medium">Giá bán lẻ đề xuất</p>
-                <div className="flex items-center gap-4">
-                  <div className="flex flex-col">
-                    <div className="flex items-baseline gap-2">
-                      <span className="font-bold text-[#1a1c1b] text-4xl tracking-tighter">
-                        {finalPrice.toLocaleString('vi-VN')}
-                      </span>
-                      <span className="text-[#594138] font-bold text-lg">VNĐ</span>
-                    </div>
-                    {priceAdj > 0 && (
-                      <div className="mt-1">
-                        <span className="text-[#a63b00] font-medium text-sm">
-                          Phí màu: +{priceAdj.toLocaleString('vi-VN')} VNĐ
-                        </span>
-                      </div>
-                    )}
+                <div className="flex flex-col">
+                  <div className="flex items-baseline gap-2">
+                    <span className="font-heading font-black text-primary text-5xl tracking-tighter drop-shadow-sm">
+                      {finalPrice.toLocaleString('vi-VN')}
+                    </span>
+                    <span className="text-primary font-bold text-xl uppercase">VNĐ</span>
                   </div>
-                  
+                  {priceAdj > 0 && (
+                    <div className="mt-2">
+                      <span className="text-[#a63b00] font-medium text-sm bg-orange-50 px-3 py-1 rounded-full">
+                        Phí màu: +{priceAdj.toLocaleString('vi-VN')} VNĐ
+                      </span>
+                    </div>
+                  )}
                   {product.appliedPromotion && (
-                    <div className="flex flex-col ml-4">
-                      <span className="text-[#a63b00] font-bold text-xs leading-none mb-1 px-2 py-1 bg-red-50 rounded-md self-start">
+                    <div className="mt-4 pt-4 border-t border-gray-100 flex flex-col gap-1">
+                      <span className="text-white font-heading font-bold text-xs uppercase tracking-wider px-3 py-1 bg-gradient-to-r from-red-600 to-primary rounded-md self-start shadow-sm">
                         {product.appliedPromotion.promotionName}
                       </span>
-                      <span className="text-gray-400 line-through text-sm leading-none mt-1">
+                      <span className="text-gray-400 line-through text-sm mt-1">
                         {finalOriginalPrice.toLocaleString('vi-VN')} VNĐ
                       </span>
                     </div>
@@ -331,30 +359,29 @@ const DetailPage: React.FC = () => {
               </div>
 
               {/* Add to cart */}
-              <form onSubmit={handleAddToCart} className="mt-10 pt-8 border-t border-gray-200">
-                <div className="flex flex-wrap items-center gap-4">
-                  <div className={`inline-flex items-center border border-gray-300 rounded-xl bg-white shadow-sm h-12 ${isOutOfStock ? 'opacity-50' : ''}`}>
-                    <button type="button" disabled={isOutOfStock} className="px-4 h-full flex items-center justify-center text-[#594138] hover:bg-gray-50 disabled:cursor-not-allowed" onClick={() => adjustQty(-1)}>
-                      <span className="material-symbols-outlined">remove</span>
+              <form onSubmit={handleAddToCart} className="mt-6">
+                <div className="flex flex-col sm:flex-row items-stretch gap-4">
+                  <div className={`flex items-center border-2 border-gray-200 rounded-2xl bg-white shadow-sm h-14 w-full sm:w-auto ${isOutOfStock ? 'opacity-50' : ''}`}>
+                    <button type="button" disabled={isOutOfStock || quantity <= 1} className="px-4 h-full flex items-center justify-center text-[#594138] hover:bg-gray-50 rounded-l-2xl disabled:cursor-not-allowed disabled:opacity-30 transition-colors" onClick={() => adjustQty(-1)}>
+                      <span className="material-symbols-outlined font-bold">remove</span>
                     </button>
-                    <input type="number" value={quantity} readOnly className="w-12 text-center font-bold text-[#1a1c1b] h-full border-x border-gray-300 focus:outline-none" />
-                    <button type="button" disabled={isOutOfStock} className="px-4 h-full flex items-center justify-center text-[#594138] hover:bg-gray-50 disabled:cursor-not-allowed" onClick={() => adjustQty(1)}>
-                      <span className="material-symbols-outlined">add</span>
+                    <input type="number" value={quantity} readOnly className="w-12 text-center font-heading font-bold text-xl text-[#1a1c1b] h-full focus:outline-none bg-transparent" />
+                    <button type="button" disabled={isOutOfStock || (selectedColor && quantity >= selectedColor.stockQuantity)} className="px-4 h-full flex items-center justify-center text-[#594138] hover:bg-gray-50 rounded-r-2xl disabled:cursor-not-allowed disabled:opacity-30 transition-colors" onClick={() => adjustQty(1)}>
+                      <span className="material-symbols-outlined font-bold">add</span>
                     </button>
                   </div>
                   
                   {!isOutOfStock ? (
-                    <>
-                      <button type="submit" className="flex-1 bg-white border border-[#a63b00] text-[#a63b00] hover:bg-orange-50 h-12 font-bold rounded-lg px-2 lg:px-4 flex items-center justify-center gap-2 shadow-sm transition-colors uppercase tracking-wider text-sm whitespace-nowrap">
-                        <span className="material-symbols-outlined text-lg">shopping_cart</span>
-                        Thêm vào giỏ
+                    <div className="flex-1 flex gap-3">
+                      <button type="submit" className="flex-1 bg-white border-2 border-primary text-primary hover:bg-orange-50 h-14 font-heading font-bold rounded-2xl px-2 lg:px-4 flex items-center justify-center gap-2 shadow-sm hover:shadow-md transition-all uppercase tracking-widest text-sm whitespace-nowrap hover:-translate-y-1">
+                        <span className="material-symbols-outlined text-xl">shopping_cart</span>
                       </button>
-                      <button type="button" onClick={handleBuyNow} className="flex-1 bg-[#a63b00] hover:bg-[#8a3100] text-white h-12 font-bold rounded-lg px-2 lg:px-4 flex items-center justify-center gap-2 shadow-sm transition-colors uppercase tracking-wider text-sm whitespace-nowrap">
+                      <button type="button" onClick={handleBuyNow} className="flex-[2] bg-primary hover:bg-primary-hover text-white h-14 font-heading font-bold rounded-2xl px-2 lg:px-4 flex items-center justify-center gap-2 shadow-lg hover:shadow-[0_8px_20px_rgba(166,59,0,0.3)] transition-all uppercase tracking-widest text-sm whitespace-nowrap hover:-translate-y-1">
                         Mua ngay
                       </button>
-                    </>
+                    </div>
                   ) : (
-                    <button type="button" disabled className="flex-1 bg-gray-400 text-white h-12 font-bold rounded-lg px-6 flex items-center justify-center gap-2 shadow-sm uppercase tracking-wider cursor-not-allowed">
+                    <button type="button" disabled className="flex-1 bg-gray-300 text-white h-14 font-heading font-bold rounded-2xl px-6 flex items-center justify-center gap-2 shadow-sm uppercase tracking-widest cursor-not-allowed">
                       <span className="material-symbols-outlined">remove_shopping_cart</span>
                       Hết hàng
                     </button>
@@ -363,42 +390,51 @@ const DetailPage: React.FC = () => {
               </form>
             </div>
             
-            <div className="w-full lg:w-2/3 order-1 lg:order-1 mb-6 md:mb-10 lg:mb-0 relative">
-               <div className="absolute inset-0 bg-gradient-to-tr from-gray-100 to-transparent rounded-full blur-3xl opacity-50 z-0"></div>
-               <div className="w-full flex items-center justify-center h-[400px] lg:h-[600px]">
-                 <img src={activeImage || "https://via.placeholder.com/800"} alt={product.name} className="max-w-full max-h-full object-contain mix-blend-multiply transition-opacity duration-300" />
+            <div className="w-full lg:w-[60%] order-1 lg:order-1 relative group flex items-center justify-center">
+               {/* Ánh sáng nền (Aura glow) */}
+               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-gradient-to-tr from-primary/20 to-transparent rounded-full blur-3xl opacity-50 z-0 pointer-events-none"></div>
+               
+               {/* Khung ảnh cố định: bo góc, viền mờ */}
+               <div className="relative z-10 w-full max-w-[1000px] aspect-[4/3] bg-white rounded-[2rem] shadow-[0_15px_50px_-12px_rgba(0,0,0,0.1)] border-4 border-white overflow-hidden flex items-center justify-center">
+                 <img 
+                   src={activeImage || "https://via.placeholder.com/800"} 
+                   alt={product.name} 
+                   className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-700 mix-blend-multiply origin-center p-4" 
+                 />
                </div>
             </div>
           </div>
 
           {/* Design / Gallery */}
           {(product.description || galleryImages.length > 0) && (
-            <section className="mt-20 pt-20 border-t border-gray-200">
-              <div className="flex flex-col lg:flex-row items-center gap-12">
-                <div className="w-full lg:w-1/3 lg:pl-12">
-                  <h3 className="text-[#a63b00] italic font-bold uppercase mb-6 text-2xl tracking-wider">THIẾT KẾ</h3>
-                  <h4 className="text-3xl font-bold tracking-tight text-[#1a1c1b] mb-6 leading-snug">
-                    Thiết kế huyền thoại, đậm chất cổ điển
-                  </h4>
-                  <p className="text-[#594138] leading-relaxed text-[0.95rem]">
-                    {product.description || "Chưa có mô tả cho sản phẩm này."}
-                  </p>
-                </div>
-                <div className="w-full lg:w-2/3">
-                  <div className="relative overflow-hidden shadow-lg rounded-2xl h-[400px] lg:h-[600px] bg-gradient-to-b from-gray-50 to-gray-200">
-                    <img loading="lazy" decoding="async" src={activeGalleryImage || "https://via.placeholder.com/800"} className="w-full h-full object-cover transition-all duration-500" alt="Gallery" />
-                    <div className="absolute bottom-0 left-0 w-full h-[150px] bg-gradient-to-t from-black/60 to-transparent"></div>
-                    
-                    <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-4 overflow-x-auto w-full justify-center px-8 snap-x">
-                      {galleryImages.map((img, idx) => (
-                        <div 
-                          key={idx} 
-                          className={`snap-center w-20 h-16 rounded-lg overflow-hidden cursor-pointer border-2 transition-all shrink-0 ${activeGalleryImage === img ? 'border-[#a63b00] opacity-100' : 'border-transparent opacity-70 hover:opacity-100'}`}
-                          onClick={() => setActiveGalleryImage(img)}
-                        >
-                          <img loading="lazy" decoding="async" src={img} className="w-full h-full object-cover" alt="Thumbnail" />
-                        </div>
-                      ))}
+            <section className="mt-10 mb-20">
+              <div className="bg-white rounded-3xl p-8 md:p-12 shadow-sm border border-gray-100">
+                <div className="flex flex-col lg:flex-row items-center gap-12">
+                  <div className="w-full lg:w-1/3">
+                    <h3 className="text-primary font-heading font-black uppercase mb-4 text-2xl tracking-wider">THIẾT KẾ</h3>
+                    <h4 className="text-3xl md:text-4xl font-heading font-bold tracking-tight text-[#1a1c1b] mb-6 leading-tight">
+                      Đậm chất thể thao, uy lực và nam tính
+                    </h4>
+                    <p className="text-[#594138] leading-relaxed text-base">
+                      {product.description || "Từng đường nét được trau chuốt tỉ mỉ, tối ưu hóa khí động học. Chiếc xe không chỉ là phương tiện di chuyển mà còn là biểu tượng của sự tự do và cá tính."}
+                    </p>
+                  </div>
+                  <div className="w-full lg:w-2/3">
+                    <div className="relative overflow-hidden shadow-xl rounded-3xl h-[400px] lg:h-[500px] bg-gray-100 group">
+                      <img loading="lazy" decoding="async" src={activeGalleryImage || "https://via.placeholder.com/800"} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="Gallery" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                      
+                      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-3 overflow-x-auto w-full justify-center px-4 snap-x pb-2 scrollbar-hide">
+                        {galleryImages.map((img, idx) => (
+                          <div 
+                            key={idx} 
+                            className={`snap-center w-20 h-20 rounded-2xl overflow-hidden cursor-pointer border-2 transition-all shrink-0 hover:-translate-y-1 ${activeGalleryImage === img ? 'border-primary opacity-100 shadow-[0_0_15px_rgba(166,59,0,0.5)]' : 'border-white/30 opacity-70 hover:opacity-100'}`}
+                            onClick={() => setActiveGalleryImage(img)}
+                          >
+                            <img loading="lazy" decoding="async" src={img} className="w-full h-full object-cover" alt="Thumbnail" />
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -408,15 +444,15 @@ const DetailPage: React.FC = () => {
 
           {/* Specifications */}
           {product.specifications && product.specifications.length > 0 && (
-            <section className="mt-20 pt-16 pb-20">
-              <h2 className="text-center font-light mb-16 text-[#1a1c1b] text-4xl">Thông số kỹ thuật</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-8 px-4 lg:px-8">
+            <section className="mb-20">
+              <h2 className="text-center font-heading font-black mb-12 text-[#1a1c1b] text-3xl md:text-4xl uppercase tracking-tight">Thông số kỹ thuật</h2>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
                 {product.specifications.map((spec, idx) => (
-                  <div key={idx} className="flex justify-between items-center h-full border-b border-gray-100 pb-3">
-                    <span className="text-[#1a1c1b] font-medium text-sm max-w-[45%]">
+                  <div key={idx} className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 flex flex-col justify-center items-center text-center h-full">
+                    <span className="text-primary font-bold text-[11px] md:text-xs uppercase tracking-widest mb-2 opacity-80">
                       {spec.specification?.specName || spec.specName || spec.name || 'Thông số'}
                     </span>
-                    <span className="text-[#594138] text-right text-sm max-w-[55%]">
+                    <span className="text-[#1a1c1b] font-heading font-bold text-lg md:text-xl">
                       {spec.specValue || spec.value || ''}
                     </span>
                   </div>
@@ -426,46 +462,53 @@ const DetailPage: React.FC = () => {
           )}
 
           {/* Reviews Section */}
-          <section className="mt-20 pt-20 border-t border-gray-200">
-            <div className="flex items-center justify-between mb-6 md:mb-10">
-              <h2 className="text-3xl font-bold tracking-tight text-[#1a1c1b] m-0">Đánh giá từ khách hàng</h2>
-              <span className="bg-gray-100 text-[#1a1c1b] border border-gray-200 px-4 py-2 text-sm rounded-full font-medium">
+          <section className="mt-20 pt-16 border-t border-gray-200">
+            <div className="flex items-center justify-between mb-10">
+              <h2 className="text-3xl md:text-4xl font-heading font-black tracking-tight text-[#1a1c1b] m-0 uppercase">Đánh giá từ khách hàng</h2>
+              <span className="bg-primary/10 text-primary px-5 py-2 text-sm rounded-full font-heading font-bold tracking-widest uppercase">
                 {comments.length} đánh giá
               </span>
             </div>
 
             {/* Review Form */}
             {isLogin && (
-              <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 mb-8 md:mb-12">
-                <h4 className="text-xl font-bold tracking-tight mb-6 text-[#1a1c1b]">Viết đánh giá của bạn</h4>
+              <div className="bg-white p-8 md:p-10 rounded-3xl shadow-sm border border-gray-100 mb-12">
+                <h4 className="text-2xl font-heading font-bold tracking-tight mb-6 text-[#1a1c1b] uppercase">Viết đánh giá của bạn</h4>
                 <form onSubmit={handleReviewSubmit}>
-                  <div className="mb-6">
-                    <label className="block font-medium text-[#594138] mb-2">Chất lượng sản phẩm <span className="text-red-500">*</span></label>
+                  <div className="mb-8">
+                    <label className="block font-bold text-[#1a1c1b] mb-3">Chất lượng sản phẩm <span className="text-red-500">*</span></label>
                     <div className="flex flex-row-reverse justify-end items-center group w-max">
                       {[5, 4, 3, 2, 1].map((star) => (
                         <React.Fragment key={star}>
                           <input type="radio" id={`star${star}`} name="rating" value={star} className="hidden peer" checked={rating === star} onChange={() => setRating(star)} />
-                          <label htmlFor={`star${star}`} className="text-4xl cursor-pointer text-gray-300 peer-checked:text-yellow-400 hover:text-yellow-400 peer-hover:text-yellow-400 transition-colors leading-none inline-block">
+                          <label htmlFor={`star${star}`} className="text-5xl cursor-pointer text-gray-200 peer-checked:text-yellow-400 hover:text-yellow-400 peer-hover:text-yellow-400 transition-colors leading-none inline-block drop-shadow-sm">
                             ★
                           </label>
                         </React.Fragment>
                       ))}
                     </div>
                   </div>
-                  <div className="mb-6">
-                    <label htmlFor="content" className="block font-medium text-[#594138] mb-2">Nội dung đánh giá <span className="text-red-500">*</span></label>
+                  <div className="mb-8">
+                    <label htmlFor="content" className="block font-bold text-[#1a1c1b] mb-3">Nội dung đánh giá <span className="text-red-500">*</span></label>
                     <textarea 
                       id="content" 
                       rows={4} 
                       value={reviewContent}
-                      onChange={(e) => setReviewContent(e.target.value)}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-[#a63b00] transition-shadow" 
+                      onChange={(e) => {
+                        setReviewContent(e.target.value);
+                        if (reviewError) setReviewError('');
+                      }}
+                      className={`w-full bg-background-light border rounded-2xl p-5 focus:outline-none transition-all text-base ${reviewError ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500' : 'border-gray-200 focus:border-primary focus:ring-1 focus:ring-primary'}`} 
                       placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm này..." 
-                      required 
-                      minLength={10}
                     ></textarea>
+                    {reviewError && (
+                      <p className="text-red-500 text-sm mt-2 font-medium flex items-center gap-1 animate-fade-in">
+                        <span className="material-symbols-outlined text-[16px]">error</span>
+                        {reviewError}
+                      </p>
+                    )}
                   </div>
-                  <button type="submit" className="bg-[#a63b00] hover:bg-[#8a3100] text-white px-8 py-3 rounded-full font-bold shadow-sm transition-colors">
+                  <button type="submit" className="bg-[#1a1c1b] hover:bg-black text-white px-10 py-4 rounded-full font-heading font-bold tracking-widest text-sm shadow-md transition-all hover:-translate-y-1 hover:shadow-lg uppercase">
                     Gửi đánh giá
                   </button>
                 </form>
@@ -473,43 +516,45 @@ const DetailPage: React.FC = () => {
             )}
 
             {comments.length === 0 ? (
-              <div className="text-center p-12 bg-gray-50 rounded-3xl border border-gray-200">
-                <span className="material-symbols-outlined text-5xl text-gray-300 mb-4">chat_bubble_outline</span>
-                <h3 className="text-xl font-bold tracking-tight text-[#1a1c1b] mb-2">Chưa có đánh giá nào</h3>
+              <div className="text-center p-16 bg-white rounded-3xl border border-dashed border-gray-300">
+                <span className="material-symbols-outlined text-6xl text-gray-300 mb-4">chat_bubble_outline</span>
+                <h3 className="text-2xl font-heading font-bold tracking-tight text-[#1a1c1b] mb-2 uppercase">Chưa có đánh giá nào</h3>
                 <p className="text-[#594138] m-0">Hãy là người đầu tiên trải nghiệm và đánh giá sản phẩm này.</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {comments.map((comment) => (
-                  <div key={comment.id} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col relative h-full">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-auto">
+                {comments.map((comment, index) => {
+                  const isLarge = index === 0 && comments.length > 2; // Bento-style logic
+                  return (
+                  <div key={comment.id} className={`bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 flex flex-col relative transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg ${isLarge ? 'md:col-span-2' : ''}`}>
                     {comment.status !== 'approved' && (
-                       <div className="absolute top-4 right-4">
-                         <span className={`px-2 py-1 text-[10px] font-bold rounded shadow-sm ${comment.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}`}>
+                       <div className="absolute top-6 right-6">
+                         <span className={`px-3 py-1.5 text-[10px] font-heading font-bold tracking-wider uppercase rounded-full shadow-sm ${comment.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}`}>
                            {comment.status === 'pending' ? 'Đang chờ duyệt' : 'Không được duyệt'}
                          </span>
                        </div>
                     )}
-                    <div className="flex items-center mb-4">
-                      <img loading="lazy" decoding="async" src={comment.customer.avatarUrl || `https://ui-avatars.com/api/?name=${comment.customer.name}&background=random`} className="rounded-full object-cover shadow-sm border border-gray-200 w-12 h-12 mr-4" alt="Avatar" />
+                    <div className="flex items-center mb-6">
+                      <img loading="lazy" decoding="async" src={comment.customer.avatarUrl || `https://ui-avatars.com/api/?name=${comment.customer.name}&background=random`} className="rounded-full object-cover shadow-sm border border-gray-100 w-14 h-14 mr-4" alt="Avatar" />
                       <div>
-                        <h4 className="font-bold text-[#1a1c1b] mb-1 text-sm">{comment.customer.name}</h4>
-                        <div className="flex items-center gap-2">
-                          <div className="text-yellow-400 flex text-sm">
+                        <h4 className="font-heading font-bold text-[#1a1c1b] text-lg uppercase">{comment.customer.name}</h4>
+                        <div className="flex items-center gap-2 mt-1">
+                          <div className="text-yellow-400 flex text-base drop-shadow-sm">
                             {[1, 2, 3, 4, 5].map(i => (
                               <span key={i}>{i <= comment.rating ? '★' : '☆'}</span>
                             ))}
                           </div>
-                          <span className="text-gray-400 text-xs">
+                          <span className="text-gray-400 text-xs font-medium">
                             {new Date(comment.createdAt).toLocaleDateString('vi-VN')}
                           </span>
                         </div>
                       </div>
                     </div>
-                    <p className="text-[#594138] flex-grow text-[0.95rem] leading-relaxed">
-                      {comment.content}
+                    <p className="text-[#594138] flex-grow text-base leading-relaxed italic">
+                      "{comment.content}"
                     </p>
                   </div>
-                ))}
+                )})}
               </div>
             )}
           </section>
